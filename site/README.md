@@ -1,6 +1,6 @@
-# iFold website
+# iFold Mac website
 
-The product site for iFold, kept alongside the app in `site/`. A static site: no framework, no build step, no dependencies.
+The product site for iFold Mac, kept alongside the app in `site/`. A static site: no framework, no build step, no dependencies.
 
 ## Run locally
 
@@ -57,4 +57,4 @@ The desktop on the screen is a real macOS screenshot (`assets/desktop.webp`, JPE
 
 ## Product notes
 
-Copy and behaviour come from the iFold README and Swift renderer. The **Download** buttons (nav and the closing section) open the setup dialog: the DMG link points at `https://github.com/maheshj01/ifold-mac/releases/latest/download/iFold.dmg` (the asset is always named `iFold.dmg`, so the link survives new releases), followed by the install steps — including the one-time Gatekeeper *Open Anyway* step while the build is signed but not notarized — and the source-build alternative. Bump the version/size line in the dialog when cutting a release; drop the Gatekeeper step once releases are notarized.
+Copy and behaviour come from the iFold README and Swift renderer. The **Download** buttons (nav and the closing section) open the setup dialog: the DMG link points at `https://github.com/maheshj01/ifold-mac/releases/latest/download/ifold-mac.dmg` (the asset is always named `ifold-mac.dmg`, so the link survives new releases), followed by the install steps — including the one-time Gatekeeper *Open Anyway* step while the build is signed but not notarized — and the source-build alternative. Bump the version/size line in the dialog when cutting a release; drop the Gatekeeper step once releases are notarized.

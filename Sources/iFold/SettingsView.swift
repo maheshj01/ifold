@@ -27,7 +27,7 @@ struct SettingsView: View {
             Image(systemName: "laptopcomputer")
                 .font(.title2)
             VStack(alignment: .leading, spacing: 2) {
-                Text("iFold").font(.headline)
+                Text("iFold Mac").font(.headline)
                 Text(statusLine).font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
@@ -48,7 +48,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 8) {
             Label("Screen Recording needed", systemImage: "exclamationmark.triangle.fill")
                 .font(.subheadline.weight(.semibold))
-            Text("iFold captures your desktop to bend it. Grant access in System Settings, then relaunch.")
+            Text("iFold Mac captures your desktop to bend it. Grant access in System Settings, then relaunch.")
                 .font(.caption).foregroundStyle(.secondary)
             HStack {
                 Button("Grant Access") { controller.requestScreenRecording() }
@@ -128,7 +128,7 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer()
-                Button("Quit iFold") { NSApp.terminate(nil) }
+                Button("Quit iFold Mac") { NSApp.terminate(nil) }
                     .keyboardShortcut("q")
             }
             .controlSize(.small)

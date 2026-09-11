@@ -1,6 +1,6 @@
 {
-  "name": "iFold",
-  "short_name": "iFold",
+  "name": "iFold Mac",
+  "short_name": "iFold Mac",
   "description": "A macOS app that bends your live desktop as you close your MacBook lid.",
   "start_url": "/",
   "display": "browser",

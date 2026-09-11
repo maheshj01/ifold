@@ -5,7 +5,7 @@ struct iFoldApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        MenuBarExtra("iFold", systemImage: "laptopcomputer") {
+        MenuBarExtra("iFold Mac", systemImage: "laptopcomputer") {
             SettingsView(settings: FoldController.shared.settings)
                 .environmentObject(FoldController.shared)
         }
@@ -28,7 +28,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let content = SettingsView(settings: FoldController.shared.settings)
             .environmentObject(FoldController.shared)
         let w = NSWindow(contentViewController: NSHostingController(rootView: content))
-        w.title = "iFold"
+        w.title = "iFold Mac"
         w.styleMask = [.titled, .closable]
         w.level = .floating
         w.isReleasedWhenClosed = false

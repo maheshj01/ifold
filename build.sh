@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Builds iFold and assembles build/iFold.app.
+# Builds iFold Mac and assembles "build/iFold Mac.app".
 #
 #   ./build.sh                 release build
 #   ./build.sh --run           build, then launch the app
@@ -10,7 +10,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 CONFIG=release
-APP=build/iFold.app
+APP="build/iFold Mac.app"
 EXTRA=()
 ACTION=""
 DEBUG_TOOLS=0
@@ -28,17 +28,17 @@ for arg in "$@"; do
 done
 
 swift build -c "$CONFIG" --scratch-path "$SCRATCH" "${EXTRA[@]}" 2>&1 | grep -v "^\[" || true
-BIN="$SCRATCH/$CONFIG/iFold"
+BIN="$SCRATCH/$CONFIG/ifold-mac"
 [[ -x "$BIN" ]] || { echo "build failed"; exit 1; }
 
 # Belt and braces: a shipping binary must not contain the developer hooks.
-if [[ $DEBUG_TOOLS -eq 0 ]] && strings "$BIN" | grep -q "ifold\.snapshot\|ifold\.demo\|DEBUG BUILD"; then
+if [[ $DEBUG_TOOLS -eq 0 ]] && strings "$BIN" | grep -q "ifold-mac\.snapshot\|ifold-mac\.demo\|DEBUG BUILD"; then
   echo "REFUSING: developer hooks found in a normal build (stale scratch dir? rm -rf .build)"; exit 1
 fi
 
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp "$BIN" "$APP/Contents/MacOS/iFold"
+cp "$BIN" "$APP/Contents/MacOS/ifold-mac"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 [[ -f Resources/AppIcon.icns ]] && cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 echo -n "APPL????" > "$APP/Contents/PkgInfo"
@@ -59,12 +59,12 @@ echo "built $APP"
 
 case "$ACTION" in
   --run)
-    pkill -x iFold 2>/dev/null || true
+    pkill -x ifold-mac 2>/dev/null || true
     open "$APP" ;;
   --install)
-    pkill -x iFold 2>/dev/null || true
-    rm -rf /Applications/iFold.app
-    cp -R "$APP" /Applications/iFold.app
-    open /Applications/iFold.app
-    echo "installed to /Applications/iFold.app" ;;
+    pkill -x ifold-mac 2>/dev/null || true
+    rm -rf "/Applications/iFold Mac.app"
+    cp -R "$APP" "/Applications/iFold Mac.app"
+    open "/Applications/iFold Mac.app"
+    echo "installed to /Applications/iFold Mac.app" ;;
 esac

@@ -1,4 +1,4 @@
-# iFold
+# iFold Mac
 
 [![Release](https://img.shields.io/github/v/release/maheshj01/ifold-mac?display_name=tag)](https://github.com/maheshj01/ifold-mac/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-macOS%2014%2B%20%C2%B7%20Apple%20silicon-111)](#requirements)
@@ -22,11 +22,11 @@ soft click when you open the lid past the clear angle.
 
 ## Install
 
-**[⬇ Download iFold.dmg](https://github.com/maheshj01/ifold-mac/releases/latest/download/iFold.dmg)**
+**[⬇ Download ifold-mac.dmg](https://github.com/maheshj01/ifold-mac/releases/latest/download/ifold-mac.dmg)**
 (latest release · [all releases](https://github.com/maheshj01/ifold-mac/releases) · [website](https://ifold-mac.vercel.app/))
 
-1. Open the DMG and drag **iFold** into **Applications**.
-2. Launch it. macOS will say it *"could not verify that iFold is free of malware"* —
+1. Open the DMG and drag **iFold Mac** into **Applications**.
+2. Launch it. macOS will say it *"could not verify that iFold Mac is free of malware"* —
    the app is signed but **not yet notarized** (that needs a paid Apple Developer ID;
    the build is [reproducible from source](#build-from-source) if you'd rather not trust
    a binary). Click **Done**, open **System Settings → Privacy & Security**, scroll
@@ -34,19 +34,19 @@ soft click when you open the lid past the clear angle.
 
    Terminal alternative that skips the dialog:
    ```bash
-   xattr -d com.apple.quarantine /Applications/iFold.app
+   xattr -d com.apple.quarantine "/Applications/iFold Mac.app"
    ```
-3. iFold asks for **Screen Recording**. Enable it under
+3. iFold Mac asks for **Screen Recording**. Enable it under
    **System Settings → Privacy & Security → Screen & System Audio Recording**,
-   then click **Relaunch** in the iFold window.
-4. Tilt the lid down a little. That's it — iFold lives in the menu bar (laptop icon).
+   then click **Relaunch** in the iFold Mac window.
+4. Tilt the lid down a little. That's it — iFold Mac lives in the menu bar (laptop icon).
 
-Verify the download if you like: `shasum -a 256 iFold.dmg` should match `SHA256SUMS`
+Verify the download if you like: `shasum -a 256 ifold-mac.dmg` should match `SHA256SUMS`
 on the release page.
 
-## Support iFold
+## Support iFold Mac
 
-iFold is free and open source. If it makes closing your Mac a little nicer,
+iFold Mac is free and open source. If it makes closing your Mac a little nicer,
 [sponsor the project on GitHub](https://github.com/sponsors/maheshj01). Sponsorship
 pays for the Apple Developer membership that lets releases be notarized — which is
 exactly what makes the *Open Anyway* step above disappear — and for the time to keep
@@ -59,7 +59,7 @@ Needs Xcode 15+ (or the Command Line Tools with a Swift 5.9 toolchain).
 ```bash
 git clone https://github.com/maheshj01/ifold-mac.git
 cd ifold-mac
-./build.sh --run        # build, assemble build/iFold.app, launch
+./build.sh --run        # build, assemble "build/iFold Mac.app", launch
 ./build.sh --install    # same, then copy to /Applications
 ```
 
@@ -69,7 +69,7 @@ On first launch grant Screen Recording as described above, then relaunch.
 
 ## Using it
 
-iFold lives in the menu bar (laptop icon). The popover shows the live hinge
+iFold Mac lives in the menu bar (laptop icon). The popover shows the live hinge
 angle and lets you tune:
 
 | Control      | What it does                                                         |
@@ -98,13 +98,13 @@ Click anywhere on the bent desktop to pause until the lid opens again.
 - **Frames are dropped on sleep, display sleep, screen lock and fast user
   switch**, and the capture stream stops. The overlay never outlives the
   session it was captured in.
-- **The overlay only captures your own display**, with iFold's own windows
+- **The overlay only captures your own display**, with iFold Mac's own windows
   excluded, and it is itself invisible to other screen recorders
   (`sharingType = .none`).
 - **Developer hooks are compiled out.** `./build.sh --debug-tools`
   adds Darwin-notification-triggered screenshot and demo-motion hooks; they are
   intentionally absent from normal builds because it would let any local
-  process borrow iFold's Screen Recording grant.
+  process borrow iFold Mac's Screen Recording grant.
 - **Distribution note.** Release DMGs are currently signed with an Apple
   Development identity, not notarized — hence the one-time *Open Anyway* step.
   `release.sh` notarizes and staples automatically as soon as a Developer ID
@@ -118,7 +118,7 @@ underneath it until you click (pause) or open the lid.
 
 Measured on an M4 MacBook Pro 14":
 
-| State | iFold CPU | RSS | Notes |
+| State | iFold Mac CPU | RSS | Notes |
 |---|---|---|---|
 | Idle, lid parked | ~1.5% | ~70 MB (mostly shared framework pages) | 30 Hz sensor poll + 20 Hz display link; capture stopped; no measurable WindowServer load |
 | Bending | ~30% | +~2 MB | ScreenCaptureKit at 60 fps full Retina; frames live in ~5 IOSurfaces (GPU); WindowServer +~10–15% for the composite |
@@ -129,11 +129,11 @@ resting at a normal working angle costs nothing beyond the idle poll.
 
 ## Debugging
 
-Logs go to the unified log under subsystem `com.wml.ifold`
+Logs go to the unified log under subsystem `com.wml.ifold-mac`
 (note: `log` is a zsh builtin, use the full path):
 
 ```bash
-/usr/bin/log stream --predicate 'subsystem == "com.wml.ifold"' --info
+/usr/bin/log stream --predicate 'subsystem == "com.wml.ifold-mac"' --info
 ```
 
 Two developer hooks exist for working on the renderer and recording demo
@@ -147,11 +147,11 @@ posture*) and only present when you build with:
 Then, with that build running:
 
 ```bash
-# Screenshot of the built-in display *including* iFold's own overlay
-defaults write com.wml.ifold snapshotPath ~/Desktop/ifold.png && notifyutil -p com.wml.ifold.snapshot
+# Screenshot of the built-in display *including* iFold Mac's own overlay
+defaults write com.wml.ifold-mac snapshotPath ~/Desktop/ifold.png && notifyutil -p com.wml.ifold-mac.snapshot
 
 # Scripted close / pause / flick-open lid path in Manual mode, visible to screen recorders
-notifyutil -p com.wml.ifold.demo
+notifyutil -p com.wml.ifold-mac.demo
 ```
 
 ## Releasing (maintainers)
@@ -164,10 +164,10 @@ notifyutil -p com.wml.ifold.demo
    ./release.sh --publish
    ```
 
-   Builds, signs, lays out `dist/iFold.dmg`, tags `v<version>`, pushes the tag, creates the GitHub
+   Builds, signs, lays out `dist/ifold-mac.dmg`, tags `v<version>`, pushes the tag, creates the GitHub
    release (or replaces the assets if the release for this commit already exists), uploads
-   `iFold.dmg` + `SHA256SUMS`, then downloads the DMG back through the public
-   `releases/latest/download/iFold.dmg` link and fails if the checksum doesn't match.
+   `ifold-mac.dmg` + `SHA256SUMS`, then downloads the DMG back through the public
+   `releases/latest/download/ifold-mac.dmg` link and fails if the checksum doesn't match.
    It refuses to run on a dirty tree, an unpushed HEAD, or a version that's already tagged at
    another commit. Add `--dry-run` to see the steps without tagging or uploading.
 
@@ -177,16 +177,16 @@ notifyutil -p com.wml.ifold.demo
    ./release.sh --check
    ```
 
-If a *Developer ID Application* identity and a `notarytool` keychain profile named `ifold` exist,
+If a *Developer ID Application* identity and a `notarytool` keychain profile named `ifold-mac` exist,
 the same command notarizes and staples both the app and the DMG. The asset is always named
-`iFold.dmg` so the download links in this README and on the website keep working.
+`ifold-mac.dmg` so the download links in this README and on the website keep working.
 
 ## How it works
 
 - `LidAngleSensor` — reads HID feature report #1 from the Apple sensor hub
   (VID 0x05AC, PID 0x8104, Sensor/Orientation usage). Public IOKit only.
 - `ScreenCapturer` — ScreenCaptureKit stream of the built-in display,
-  excluding iFold's own windows.
+  excluding iFold Mac's own windows.
 - `FoldView` — the desktop as a flexible sheet: 18 horizontal strips
   (IOSurface contents + `contentsRect`) chained end to end and rotated
   progressively so the surface curves away from the hinge, under a perspective

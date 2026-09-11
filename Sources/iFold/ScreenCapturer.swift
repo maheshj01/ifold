@@ -12,7 +12,7 @@ enum CaptureError: LocalizedError {
 /// this app's own windows so the overlay never captures itself.
 final class ScreenCapturer: NSObject, SCStreamOutput, SCStreamDelegate {
     private var stream: SCStream?
-    private let outputQueue = DispatchQueue(label: "ifold.capture", qos: .userInteractive)
+    private let outputQueue = DispatchQueue(label: "ifold-mac.capture", qos: .userInteractive)
     private var loggedFirstFrame = false
 
     /// Delivered on the main thread. Retain the buffer for as long as you display it.

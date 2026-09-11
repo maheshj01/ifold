@@ -3,7 +3,7 @@ import Combine
 import CoreGraphics
 import os
 
-let log = Logger(subsystem: "com.wml.ifold", category: "fold")
+let log = Logger(subsystem: "com.wml.ifold-mac", category: "fold")
 
 /// Orchestrates sensor → capture → overlay.
 ///

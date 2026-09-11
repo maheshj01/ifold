@@ -12,7 +12,7 @@ final class LidAngleSensor {
     private let manager: IOHIDManager
     private var device: IOHIDDevice?
     private let none = IOOptionBits(kIOHIDOptionsTypeNone)
-    private let queue = DispatchQueue(label: "ifold.lid-sensor", qos: .userInteractive)
+    private let queue = DispatchQueue(label: "ifold-mac.lid-sensor", qos: .userInteractive)
     private var timer: DispatchSourceTimer?
 
     /// Called on the main thread every sample (~60 Hz) with the angle in degrees.

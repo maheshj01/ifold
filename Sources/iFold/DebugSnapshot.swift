@@ -7,12 +7,12 @@ import notify
 
 /// DEVELOPMENT ONLY — compiled in by `./build.sh --debug-tools`, never in a normal build.
 ///
-/// `notifyutil -p com.wml.ifold.snapshot` makes the app grab a screenshot of
+/// `notifyutil -p com.wml.ifold-mac.snapshot` makes the app grab a screenshot of
 /// the built-in display *including* its own overlay and write it to the path in
-/// the `snapshotPath` default (falls back to /tmp/ifold-snap.png).
+/// the `snapshotPath` default (falls back to /tmp/ifold-mac-snap.png).
 ///
 /// Why it's gated: Darwin notifications and `defaults write` need no privileges,
-/// so in a shipping build this would let any local process use iFold's Screen
+/// so in a shipping build this would let any local process use iFold Mac's Screen
 /// Recording grant to capture the screen — a TCC bypass.
 @MainActor
 final class DebugSnapshot {
@@ -23,7 +23,7 @@ final class DebugSnapshot {
     init(window: @escaping () -> NSWindow?, displayID: @escaping () -> CGDirectDisplayID?) {
         self.window = window
         self.displayID = displayID
-        notify_register_dispatch("com.wml.ifold.snapshot", &token, DispatchQueue.main) { [weak self] _ in
+        notify_register_dispatch("com.wml.ifold-mac.snapshot", &token, DispatchQueue.main) { [weak self] _ in
             Task { @MainActor in await self?.capture() }
         }
         log.warning("DEBUG BUILD: snapshot hook armed — do not ship this binary")
@@ -31,7 +31,7 @@ final class DebugSnapshot {
 
     private func capture() async {
         guard let id = displayID() else { return }
-        let path = UserDefaults.standard.string(forKey: "snapshotPath") ?? "/tmp/ifold-snap.png"
+        let path = UserDefaults.standard.string(forKey: "snapshotPath") ?? "/tmp/ifold-mac-snap.png"
         let w = window()
         w?.sharingType = .readOnly // let the screenshot see the overlay
         defer { w?.sharingType = .none }
@@ -59,7 +59,7 @@ final class DebugSnapshot {
 #if IFOLD_DEBUG
 /// DEVELOPMENT ONLY — scripted lid motion for recording demo footage.
 ///
-/// `notifyutil -p com.wml.ifold.demo` switches to Manual mode, plays a
+/// `notifyutil -p com.wml.ifold-mac.demo` switches to Manual mode, plays a
 /// hand-like close / pause / dip / flick-open path through `manualAngle`, and
 /// keeps the overlay visible to screen recorders for the duration. Settings are
 /// restored afterwards. Gated for the same reason as `DebugSnapshot`.
@@ -79,7 +79,7 @@ final class DemoDriver {
     init(settings: Settings, window: @escaping () -> NSWindow?) {
         self.settings = settings
         self.window = window
-        notify_register_dispatch("com.wml.ifold.demo", &token, DispatchQueue.main) { [weak self] _ in
+        notify_register_dispatch("com.wml.ifold-mac.demo", &token, DispatchQueue.main) { [weak self] _ in
             Task { @MainActor in self?.play() }
         }
     }

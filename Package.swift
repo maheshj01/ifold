@@ -4,6 +4,9 @@ import PackageDescription
 let package = Package(
     name: "iFold",
     platforms: [.macOS(.v14)],
+    products: [
+        .executable(name: "ifold-mac", targets: ["iFold"]),
+    ],
     targets: [
         .executableTarget(
             name: "iFold",
