@@ -11,13 +11,18 @@ function isOutside(dialog, event) {
 function openDialog(dialog) {
   dialog.showModal();
   document.body.classList.add('modal-open');
+  const video = dialog.querySelector('video');
+  if (video) {
+    video.currentTime = 0;
+    video.play().catch(() => {}); // autoplay with sound can be refused; controls remain
+  }
 }
 
 export function setupDialogs() {
   const openers = [
     ['#nav-download', '#setup-dialog'],
     ['#get-download', '#setup-dialog'],
-    ['#view-photo', '#photo-dialog'],
+    ['#view-video', '#video-dialog'],
   ];
   for (const [buttonSelector, dialogSelector] of openers) {
     const dialog = document.querySelector(dialogSelector);
@@ -26,7 +31,10 @@ export function setupDialogs() {
 
   for (const dialog of document.querySelectorAll('dialog')) {
     dialog.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
-    dialog.addEventListener('close', () => document.body.classList.remove('modal-open'));
+    dialog.addEventListener('close', () => {
+      document.body.classList.remove('modal-open');
+      dialog.querySelector('video')?.pause();
+    });
     dialog.addEventListener('click', (event) => {
       if (event.target === dialog && isOutside(dialog, event)) dialog.close();
     });

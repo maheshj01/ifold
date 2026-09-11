@@ -40,7 +40,7 @@ site/dist/
     ├── icon.svg, favicon-32.png, apple-touch-icon.png
     ├── desktop.{webp,jpg}   the real desktop shown on the screen
     ├── og.jpg            1200×630 social preview
-    └── ifold-in-action-{800,1200,1800}.{jpg,webp}   responsive photo
+    └── ifold-demo.mp4 + ifold-demo-poster.jpg   13 s desk video (muted loop inline, with sound in the dialog)
 ```
 
 ## How the demo works

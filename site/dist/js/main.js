@@ -128,6 +128,21 @@ reducedMotion.addEventListener('change', () => {
   updateScroll();
 });
 
+// --- Desk video: plays silently only while it is on screen -----------------
+
+const deskVideo = document.querySelector('#desk-video');
+if (reducedMotion.matches) {
+  deskVideo.controls = true; // no autoplay; let the visitor choose
+} else {
+  new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) deskVideo.play().catch(() => {});
+      else deskVideo.pause();
+    },
+    { threshold: 0.35 },
+  ).observe(deskVideo);
+}
+
 // --- Go --------------------------------------------------------------------
 
 setupDialogs();

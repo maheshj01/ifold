@@ -156,26 +156,22 @@
             This is iFold on an actual MacBook.<br />
             The desktop leans away as the lid comes down, creating that just-one-more-time feeling.
           </p>
-          <button class="text-button" id="view-photo" type="button">Take a closer look <span aria-hidden="true">↗</span></button>
+          <button class="text-button" id="view-video" type="button">Watch it with sound <span aria-hidden="true">↗</span></button>
         </div>
         <figure>
-          <picture>
-            <source
-              type="image/webp"
-              srcset="assets/ifold-in-action-800.webp 800w, assets/ifold-in-action-1200.webp 1200w, assets/ifold-in-action-1800.webp 1800w"
-              sizes="(max-width: 600px) 100vw, 55vw"
-            />
-            <img
-              src="assets/ifold-in-action-1200.jpg"
-              srcset="assets/ifold-in-action-800.jpg 800w, assets/ifold-in-action-1200.jpg 1200w, assets/ifold-in-action-1800.jpg 1800w"
-              sizes="(max-width: 600px) 100vw, 55vw"
-              width="1800"
-              height="1350"
-              loading="lazy"
-              decoding="async"
-              alt="iFold running on a silver MacBook, with the live desktop bent back from the bottom of the screen"
-            />
-          </picture>
+          <video
+            id="desk-video"
+            class="desk-video"
+            src="assets/ifold-demo.mp4"
+            poster="assets/ifold-demo-poster.jpg"
+            width="1920"
+            height="1080"
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            aria-label="iFold on a real MacBook: the desktop bends as the lid is closed and springs back as it opens"
+          ></video>
           <figcaption>iFold in the wild. From the creator’s desk.</figcaption>
         </figure>
       </section>
@@ -250,10 +246,10 @@
       <p>Needs Xcode. The app you get is identical — <a href="https://github.com/maheshj01/ifold">source on GitHub</a>.</p>
     </dialog>
 
-    <dialog id="photo-dialog" aria-label="A closer look at iFold on a real MacBook">
-      <button class="dialog-close" type="button" aria-label="Close photo">×</button>
-      <img src="assets/ifold-in-action-1800.jpg" width="1800" height="1350" loading="lazy" alt="Close-up of iFold bending a real MacBook desktop" />
-      <p>A closer look at iFold on a real MacBook.</p>
+    <dialog id="video-dialog" aria-label="iFold on a real MacBook, with sound">
+      <button class="dialog-close" type="button" aria-label="Close video">×</button>
+      <video id="dialog-video" src="assets/ifold-demo.mp4" poster="assets/ifold-demo-poster.jpg" width="1920" height="1080" controls playsinline preload="metadata"></video>
+      <p>Filmed at the creator’s desk.</p>
     </dialog>
   </body>
 </html>
