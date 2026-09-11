@@ -736,6 +736,24 @@ pre button {
   padding-left: 15px;
 }
 
+/* Setup dialog: download action and the numbered install steps */
+.dialog-actions { margin: 26px 0 6px; }
+.download-meta { font-size: 13px; color: #86868b; margin: 14px 0 0; line-height: 1.6; }
+dialog .steps { list-style: none; padding: 0; margin: 0; counter-reset: step; }
+dialog .steps li { position: relative; padding-left: 42px; margin-bottom: 18px; }
+dialog .steps li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute; left: 0; top: 0;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--ink); color: #fff;
+  font-size: 13px; font-weight: 600; line-height: 26px; text-align: center;
+}
+dialog .steps strong { color: var(--ink); font-weight: 600; }
+dialog .steps pre { margin: 12px 0 0; }
+dialog pre code { flex: 1; min-width: 0; white-space: pre-wrap; word-break: break-all; line-height: 1.5; }
+dialog p a { color: var(--accent); }
+
 #photo-dialog {
   width: min(1050px, calc(100% - 32px));
   padding: 20px;

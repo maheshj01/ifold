@@ -57,4 +57,4 @@ The desktop on the screen is a real macOS screenshot (`assets/desktop.webp`, JPE
 
 ## Product notes
 
-Copy and behaviour come from the iFold README and Swift renderer. There is intentionally no installer download link yet; "Explore iFold" explains the source build. Replace that dialog with a release URL when one exists.
+Copy and behaviour come from the iFold README and Swift renderer. The **Download** buttons (nav and the closing section) open the setup dialog: the DMG link points at `https://github.com/maheshj01/ifold/releases/latest/download/iFold.dmg` (the asset is always named `iFold.dmg`, so the link survives new releases), followed by the install steps — including the one-time Gatekeeper *Open Anyway* step while the build is signed but not notarized — and the source-build alternative. Bump the version/size line in the dialog when cutting a release; drop the Gatekeeper step once releases are notarized.

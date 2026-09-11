@@ -3,7 +3,7 @@
 [![Release](https://img.shields.io/github/v/release/maheshj01/ifold?display_name=tag)](https://github.com/maheshj01/ifold/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-macOS%2014%2B%20%C2%B7%20Apple%20silicon-111)](#requirements)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![Website](https://img.shields.io/badge/website-maheshj01.github.io%2Fifold-4AA4FF)](https://maheshj01.github.io/ifold/)
+[![Website](https://img.shields.io/badge/website-ifold--mac.vercel.app-0f7f8c)](https://ifold-mac.vercel.app/)
 
 iPhone Duo's fold, for the MacBook lid you already have.
 
@@ -22,7 +22,7 @@ soft click when you open the lid past the clear angle.
 ## Install
 
 **[⬇ Download iFold.dmg](https://github.com/maheshj01/ifold/releases/latest/download/iFold.dmg)**
-(latest release · [all releases](https://github.com/maheshj01/ifold/releases) · [website with illustrated steps](https://maheshj01.github.io/ifold/))
+(latest release · [all releases](https://github.com/maheshj01/ifold/releases) · [website](https://ifold-mac.vercel.app/))
 
 1. Open the DMG and drag **iFold** into **Applications**.
 2. Launch it. macOS will say it *"could not verify that iFold is free of malware"* —

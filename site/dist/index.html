@@ -48,7 +48,7 @@
       <nav aria-label="Main navigation">
         <a href="#experience">Experience</a>
         <a href="#details">The little details</a>
-        <a class="button small" href="#get-ifold">Meet iFold <span aria-hidden="true">↗</span></a>
+        <button class="button small" id="nav-download" type="button">Download <span aria-hidden="true">↓</span></button>
       </nav>
     </header>
 
@@ -190,7 +190,7 @@
         <p class="eyebrow">iFold FOR MAC</p>
         <h2>A new angle on<br />your everyday.</h2>
         <p>A little app. An unexpectedly lovely detail.</p>
-        <button class="button" id="setup-button" type="button">Explore iFold <span aria-hidden="true">↗</span></button>
+        <button class="button" id="get-download" type="button">Download iFold <span aria-hidden="true">↓</span></button>
         <p class="compatibility">macOS Sonoma 14+ <span aria-hidden="true">·</span> Supported Apple silicon MacBooks</p>
       </section>
     </main>
@@ -203,23 +203,51 @@
 
     <dialog id="setup-dialog" aria-labelledby="setup-title">
       <button class="dialog-close" type="button" aria-label="Close">×</button>
-      <p class="eyebrow">A LITTLE HEADS-UP</p>
-      <h2 id="setup-title">Meet your Mac’s<br />softer side.</h2>
-      <p>iFold is currently a source-build app. This preview doesn’t include a public installer.</p>
-      <h3>What you’ll need</h3>
-      <ul>
-        <li>macOS Sonoma 14 or later.</li>
+      <p class="eyebrow">GET iFold</p>
+      <h2 id="setup-title">Download.<br />Then one extra click.</h2>
+      <p>
+        iFold is free and open source. It isn’t notarized by Apple yet, so the first launch takes one extra step —
+        it’s spelled out below.
+      </p>
+      <div class="dialog-actions">
+        <a class="button" href="https://github.com/maheshj01/ifold/releases/latest/download/iFold.dmg" download>
+          Download iFold.dmg <span aria-hidden="true">↓</span>
+        </a>
+        <p class="download-meta">
+          Version 1.0.0 · 0.6 MB · macOS Sonoma 14+ · Apple silicon MacBook with a lid sensor (M2 Air and later,
+          14-inch / 16-inch Pro)
+        </p>
+      </div>
+
+      <h3>Installing</h3>
+      <ol class="steps">
         <li>
-          An Apple silicon MacBook with a lid-angle sensor. The project lists M2 Air and later, and 14-inch / 16-inch
-          Pro models.
+          <strong>Drag iFold to Applications.</strong> Open the disk image, drag the app across, then launch it from
+          Applications.
         </li>
-        <li>Screen Recording permission to bend your live desktop.</li>
-      </ul>
-      <p class="privacy-note">The app processes frames on your Mac. Nothing is recorded to disk or uploaded.</p>
-      <h3>Already have the project?</h3>
-      <p>In the iFold project folder, run:</p>
-      <pre><code>./build.sh --run</code><button id="copy-command" type="button" aria-label="Copy build command">Copy</button></pre>
-      <p>Grant Screen Recording permission when prompted, then relaunch iFold.</p>
+        <li>
+          <strong>When macOS says it “could not verify iFold.app”, click Done.</strong> Not <em>Move to Trash</em>.
+          This appears for every app that isn’t notarized, and Done is what unlocks the next step.
+        </li>
+        <li>
+          <strong>Allow it once.</strong> Open System Settings → Privacy &amp; Security, scroll to the bottom, click
+          <em>Open Anyway</em>, then <em>Open</em>. Or skip the dialog from Terminal:
+          <pre><code>xattr -d com.apple.quarantine /Applications/iFold.app</code><button type="button" data-copy="xattr -d com.apple.quarantine /Applications/iFold.app" aria-label="Copy Terminal command">Copy</button></pre>
+        </li>
+        <li>
+          <strong>Grant Screen Recording, then Relaunch.</strong> iFold bends a live copy of your screen, so macOS asks
+          for Screen Recording. Turn it on under System Settings → Privacy &amp; Security → Screen &amp; System Audio
+          Recording, then click <em>Relaunch</em> in iFold.
+        </li>
+      </ol>
+      <p class="privacy-note">
+        Frames are processed on your Mac and stay in GPU memory. Nothing is recorded to disk or uploaded. Every release
+        lists its SHA-256 on GitHub.
+      </p>
+
+      <h3>Rather build it yourself?</h3>
+      <pre><code>git clone https://github.com/maheshj01/ifold.git &amp;&amp; cd ifold &amp;&amp; ./build.sh --run</code><button type="button" data-copy="git clone https://github.com/maheshj01/ifold.git && cd ifold && ./build.sh --run" aria-label="Copy build command">Copy</button></pre>
+      <p>Needs Xcode. The app you get is identical — <a href="https://github.com/maheshj01/ifold">source on GitHub</a>.</p>
     </dialog>
 
     <dialog id="photo-dialog" aria-label="A closer look at iFold on a real MacBook">

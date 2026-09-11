@@ -1,6 +1,6 @@
 /**
  * Native <dialog> wiring: open buttons, close buttons, click-outside-to-close,
- * body scroll lock, and the copy-to-clipboard button in the setup dialog.
+ * body scroll lock, and the copy-to-clipboard buttons ([data-copy]) in the setup dialog.
  */
 
 function isOutside(dialog, event) {
@@ -15,7 +15,8 @@ function openDialog(dialog) {
 
 export function setupDialogs() {
   const openers = [
-    ['#setup-button', '#setup-dialog'],
+    ['#nav-download', '#setup-dialog'],
+    ['#get-download', '#setup-dialog'],
     ['#view-photo', '#photo-dialog'],
   ];
   for (const [buttonSelector, dialogSelector] of openers) {
@@ -31,7 +32,7 @@ export function setupDialogs() {
     });
   }
 
-  setupCopyButton(document.querySelector('#copy-command'), './build.sh --run');
+  for (const button of document.querySelectorAll('[data-copy]')) setupCopyButton(button, button.dataset.copy);
 }
 
 function setupCopyButton(button, command) {
