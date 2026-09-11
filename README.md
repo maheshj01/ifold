@@ -59,8 +59,8 @@ Click anywhere on the bent desktop to pause until the lid opens again.
 - **The overlay only captures your own display**, with iFold's own windows
   excluded, and it is itself invisible to other screen recorders
   (`sharingType = .none`).
-- **Developer snapshot hook is compiled out.** `./build.sh --debug-tools`
-  adds a Darwin-notification-triggered screenshot for debugging renders; it is
+- **Developer hooks are compiled out.** `./build.sh --debug-tools`
+  adds Darwin-notification-triggered screenshot and demo-motion hooks; they are
   intentionally absent from normal builds because it would let any local
   process borrow iFold's Screen Recording grant.
 - **Distribution note.** `build.sh` signs with your Apple Development identity,
@@ -93,11 +93,22 @@ Logs go to the unified log under subsystem `com.wml.ifold`
 /usr/bin/log stream --predicate 'subsystem == "com.wml.ifold"' --info
 ```
 
-To see exactly what the overlay renders, ask the running app for a screenshot
-of the built-in display *including* its own window:
+Two developer hooks exist for working on the renderer and recording demo
+footage. They are **compiled out of normal builds** (see *Privacy & security
+posture*) and only present when you build with:
 
 ```bash
+./build.sh --debug-tools --run
+```
+
+Then, with that build running:
+
+```bash
+# Screenshot of the built-in display *including* iFold's own overlay
 defaults write com.wml.ifold snapshotPath ~/Desktop/ifold.png && notifyutil -p com.wml.ifold.snapshot
+
+# Scripted close / pause / flick-open lid path in Manual mode, visible to screen recorders
+notifyutil -p com.wml.ifold.demo
 ```
 
 ## How it works

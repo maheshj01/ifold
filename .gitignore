@@ -13,3 +13,8 @@ build/
 *.xcodeproj
 *.xcworkspace
 xcuserdata/
+
+# Release artifacts (release.sh output)
+dist/
+*.dmg
+.build-debug-tools/

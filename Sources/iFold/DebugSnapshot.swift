@@ -59,7 +59,7 @@ final class DebugSnapshot {
 #if IFOLD_DEBUG
 /// DEVELOPMENT ONLY — scripted lid motion for recording demo footage.
 ///
-/// `notifyutil -p com.mahesh.ifold.demo` switches to Manual mode, plays a
+/// `notifyutil -p com.wml.ifold.demo` switches to Manual mode, plays a
 /// hand-like close / pause / dip / flick-open path through `manualAngle`, and
 /// keeps the overlay visible to screen recorders for the duration. Settings are
 /// restored afterwards. Gated for the same reason as `DebugSnapshot`.
@@ -79,7 +79,7 @@ final class DemoDriver {
     init(settings: Settings, window: @escaping () -> NSWindow?) {
         self.settings = settings
         self.window = window
-        notify_register_dispatch("com.mahesh.ifold.demo", &token, DispatchQueue.main) { [weak self] _ in
+        notify_register_dispatch("com.wml.ifold.demo", &token, DispatchQueue.main) { [weak self] _ in
             Task { @MainActor in self?.play() }
         }
     }

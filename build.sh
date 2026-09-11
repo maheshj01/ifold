@@ -13,16 +13,28 @@ CONFIG=release
 APP=build/iFold.app
 EXTRA=()
 ACTION=""
+DEBUG_TOOLS=0
+# The developer variant builds in its own scratch directory: SwiftPM caches
+# -Xswiftc flags in the build description and does not drop them when they
+# disappear from the command line, so sharing .build would leak the hooks
+# into every later "normal" build.
+SCRATCH=.build
 for arg in "$@"; do
   case "$arg" in
-    --debug-tools) EXTRA=(-Xswiftc -DIFOLD_DEBUG); echo "!! developer build: snapshot hook enabled" ;;
+    --debug-tools) DEBUG_TOOLS=1; EXTRA=(-Xswiftc -DIFOLD_DEBUG); SCRATCH=.build-debug-tools
+                   echo "!! developer build: snapshot + demo hooks enabled" ;;
     *) ACTION="$arg" ;;
   esac
 done
 
-swift build -c "$CONFIG" "${EXTRA[@]}" 2>&1 | grep -v "^\[" || true
-BIN=".build/$CONFIG/iFold"
+swift build -c "$CONFIG" --scratch-path "$SCRATCH" "${EXTRA[@]}" 2>&1 | grep -v "^\[" || true
+BIN="$SCRATCH/$CONFIG/iFold"
 [[ -x "$BIN" ]] || { echo "build failed"; exit 1; }
+
+# Belt and braces: a shipping binary must not contain the developer hooks.
+if [[ $DEBUG_TOOLS -eq 0 ]] && strings "$BIN" | grep -q "ifold\.snapshot\|ifold\.demo\|DEBUG BUILD"; then
+  echo "REFUSING: developer hooks found in a normal build (stale scratch dir? rm -rf .build)"; exit 1
+fi
 
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
