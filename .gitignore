@@ -14,7 +14,7 @@ build/
 *.xcworkspace
 xcuserdata/
 
-# Release artifacts (release.sh output)
-dist/
+# Release artifacts (release.sh output) — root only; site/dist is the website
+/dist/
 *.dmg
 .build-debug-tools/

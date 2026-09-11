@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>iFold — Give your desktop a new dimension.</title>
+    <meta
+      name="description"
+      content="Meet iFold. A macOS app that bends your live desktop as you close your MacBook lid. A little movement. A whole new dimension."
+    />
+    <meta name="theme-color" content="#f5f5f7" />
+    <link rel="canonical" href="https://maheshj01.github.io/ifold/" />
+
+    <!-- Social sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="iFold" />
+    <meta property="og:url" content="https://maheshj01.github.io/ifold/" />
+    <meta property="og:title" content="iFold — Give your desktop a new dimension." />
+    <meta
+      property="og:description"
+      content="A macOS app that bends your live desktop as you close your MacBook lid."
+    />
+    <meta property="og:image" content="https://maheshj01.github.io/ifold/assets/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="iFold bending a MacBook desktop as the lid closes" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Icons -->
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+    <link rel="manifest" href="site.webmanifest" />
+
+    <link rel="stylesheet" href="css/style.css" />
+    <script type="module" src="js/main.js"></script>
+  </head>
+
+  <body>
+    <a class="skip" href="#experience">Skip to interactive demo</a>
+
+    <header class="nav">
+      <a class="brand" href="#" aria-label="iFold home">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <path d="m5 8 11 4 11-4v16l-11-4-11 4V8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+          <path d="M16 12v8" stroke="currentColor" stroke-width="2" />
+        </svg>
+        iFold
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="#experience">Experience</a>
+        <a href="#details">The little details</a>
+        <a class="button small" href="#get-ifold">Meet iFold <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Hero: the MacBook lowers its lid as the visitor scrolls -->
+      <section class="hero" id="experience">
+        <div class="hero-sticky">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="tiny-fold" aria-hidden="true">⌘</span> A LITTLE MAC MAGIC</p>
+            <h1>Give your desktop<br />a new <span>dimension.</span></h1>
+            <p>Close the lid. Feel the fold.<br />Your Mac has a new way to move.</p>
+          </div>
+
+          <div class="product-stage">
+            <canvas
+              id="hero-canvas"
+              role="img"
+              aria-label="Interactive illustration of a MacBook. Its desktop bends as the lid angle changes."
+            ></canvas>
+            <p class="stage-caption"><span class="caption-rule" aria-hidden="true"></span>Same Mac. A different feeling.</p>
+          </div>
+
+          <div class="hero-bottom">
+            <p class="scroll-cue"><span aria-hidden="true">↓</span> SCROLL TO FEEL THE FOLD</p>
+            <button class="replay" id="hero-replay" type="button">
+              <span aria-hidden="true">▶</span> See it move
+            </button>
+            <p class="mac-label">Made for macOS</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="intro section-pad" id="details">
+        <p class="eyebrow">HARDWARE. MEET A LITTLE WONDER.</p>
+        <h2>Your desktop.<br />With a softer side.</h2>
+        <p class="intro-description">
+          You already close your MacBook every day.<br />
+          iFold makes that ordinary moment feel extraordinary. Your live desktop gently bends, catches the light, and
+          slips away with the lid. Open it again, and everything springs back into place.
+        </p>
+      </section>
+
+      <!-- Playground: drive the lid angle by hand -->
+      <section class="playground section-pad" id="playground">
+        <div class="demo-heading">
+          <div>
+            <p class="eyebrow">A FEELING YOU CAN PLAY WITH</p>
+            <h2>Go on.<br />Give it a fold.</h2>
+          </div>
+          <p>One gesture. A whole range of feelings.<br />Drag the angle and find yours.</p>
+        </div>
+
+        <div class="demo-surface">
+          <canvas id="demo-canvas" role="img" aria-label="MacBook fold preview controlled by the lid angle slider"></canvas>
+          <p class="angle-readout" aria-hidden="true">
+            <span id="angle-number">95</span><span>°</span><small>LID ANGLE</small>
+          </p>
+        </div>
+
+        <div class="controls">
+          <div class="presets" role="group" aria-label="Fold style">
+            <button type="button" aria-pressed="true" data-preset="silk">Silk</button>
+            <button type="button" aria-pressed="false" data-preset="shade">Shade</button>
+            <button type="button" aria-pressed="false" data-preset="frost">Frost</button>
+          </div>
+          <div class="angle-control">
+            <span aria-hidden="true">Close</span>
+            <input id="angle" type="range" min="30" max="115" value="95" aria-label="Lid angle" aria-valuetext="95 degrees" />
+            <span aria-hidden="true">Open</span>
+          </div>
+          <button id="demo-replay" class="round-button" type="button" aria-label="Replay fold">↻</button>
+        </div>
+        <p class="demo-note">Interactive illustration. The Mac app responds to your actual lid.</p>
+      </section>
+
+      <section class="detail-grid section-pad" aria-label="The little details">
+        <article>
+          <span class="detail-icon" aria-hidden="true">↗</span>
+          <h3>It follows your lead.</h3>
+          <p>
+            Your MacBook’s built-in lid sensor turns a familiar movement into something you can feel. No extra hardware.
+            Just close the lid.
+          </p>
+        </article>
+        <article>
+          <span class="detail-icon" aria-hidden="true">≈</span>
+          <h3>A beautifully soft landing.</h3>
+          <p>A little perspective. A sweep of light. A hint of motion blur. Then a gentle spring back to the desktop you know.</p>
+        </article>
+        <article>
+          <span class="detail-icon" aria-hidden="true">⌘</span>
+          <h3>Quietly, in your menu bar.</h3>
+          <p>
+            Dial in the bend, shade, and frost. Pick Silk, Shade, or Frost. Make it feel just right, then let iFold do
+            its thing.
+          </p>
+        </article>
+      </section>
+
+      <section class="real-world section-pad">
+        <div class="real-copy">
+          <p class="eyebrow">OFF THE RENDER. ON YOUR DESK.</p>
+          <h2>A small detail.<br />A real delight.</h2>
+          <p>
+            This is iFold on an actual MacBook.<br />
+            The desktop leans away as the lid comes down, creating that just-one-more-time feeling.
+          </p>
+          <button class="text-button" id="view-photo" type="button">Take a closer look <span aria-hidden="true">↗</span></button>
+        </div>
+        <figure>
+          <picture>
+            <source
+              type="image/webp"
+              srcset="assets/ifold-in-action-800.webp 800w, assets/ifold-in-action-1200.webp 1200w, assets/ifold-in-action-1800.webp 1800w"
+              sizes="(max-width: 600px) 100vw, 55vw"
+            />
+            <img
+              src="assets/ifold-in-action-1200.jpg"
+              srcset="assets/ifold-in-action-800.jpg 800w, assets/ifold-in-action-1200.jpg 1200w, assets/ifold-in-action-1800.jpg 1800w"
+              sizes="(max-width: 600px) 100vw, 55vw"
+              width="1800"
+              height="1350"
+              loading="lazy"
+              decoding="async"
+              alt="iFold running on a silver MacBook, with the live desktop bent back from the bottom of the screen"
+            />
+          </picture>
+          <figcaption>iFold in the wild. From the creator’s desk.</figcaption>
+        </figure>
+      </section>
+
+      <section class="get section-pad" id="get-ifold">
+        <div class="app-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="m5 8 11 4 11-4v16l-11-4-11 4V8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+            <path d="M16 12v8" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+        </div>
+        <p class="eyebrow">iFold FOR MAC</p>
+        <h2>A new angle on<br />your everyday.</h2>
+        <p>A little app. An unexpectedly lovely detail.</p>
+        <button class="button" id="setup-button" type="button">Explore iFold <span aria-hidden="true">↗</span></button>
+        <p class="compatibility">macOS Sonoma 14+ <span aria-hidden="true">·</span> Supported Apple silicon MacBooks</p>
+      </section>
+    </main>
+
+    <footer>
+      <a class="brand" href="#">iFold</a>
+      <p>Made for the joy of it.</p>
+      <span>An independent app for Mac.</span>
+    </footer>
+
+    <dialog id="setup-dialog" aria-labelledby="setup-title">
+      <button class="dialog-close" type="button" aria-label="Close">×</button>
+      <p class="eyebrow">A LITTLE HEADS-UP</p>
+      <h2 id="setup-title">Meet your Mac’s<br />softer side.</h2>
+      <p>iFold is currently a source-build app. This preview doesn’t include a public installer.</p>
+      <h3>What you’ll need</h3>
+      <ul>
+        <li>macOS Sonoma 14 or later.</li>
+        <li>
+          An Apple silicon MacBook with a lid-angle sensor. The project lists M2 Air and later, and 14-inch / 16-inch
+          Pro models.
+        </li>
+        <li>Screen Recording permission to bend your live desktop.</li>
+      </ul>
+      <p class="privacy-note">The app processes frames on your Mac. Nothing is recorded to disk or uploaded.</p>
+      <h3>Already have the project?</h3>
+      <p>In the iFold project folder, run:</p>
+      <pre><code>./build.sh --run</code><button id="copy-command" type="button" aria-label="Copy build command">Copy</button></pre>
+      <p>Grant Screen Recording permission when prompted, then relaunch iFold.</p>
+    </dialog>
+
+    <dialog id="photo-dialog" aria-label="A closer look at iFold on a real MacBook">
+      <button class="dialog-close" type="button" aria-label="Close photo">×</button>
+      <img src="assets/ifold-in-action-1800.jpg" width="1800" height="1350" loading="lazy" alt="Close-up of iFold bending a real MacBook desktop" />
+      <p>A closer look at iFold on a real MacBook.</p>
+    </dialog>
+  </body>
+</html>

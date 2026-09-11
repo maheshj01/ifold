@@ -1,0 +1,1128 @@
+/* ==========================================================================
+   iFold — site styles
+   Sections: tokens & reset · nav · hero · intro · playground · details ·
+   real-world · get · footer · dialogs · 404 · responsive · reduced motion
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Tokens & reset
+   -------------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+  --paper: #f5f5f7;
+  --ink: #1d1d1f;
+  --muted: #6e6e73;
+  --accent: #0f7f8c; /* deep teal — echoes the wallpaper, deliberately not Apple's blue */
+  --accent-hover: #0b6d78;
+  --line: #d8d8dc;
+  --focus: #1a9bab;
+  --dark-surface: #101113;
+  --dark-control: #252629;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+body {
+  margin: 0;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+::selection {
+  background: #bfe6ea;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button,
+a {
+  touch-action: manipulation;
+  outline-offset: 6px;
+}
+
+button,
+input,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--focus);
+}
+
+/* Shared type */
+h1 {
+  font-size: clamp(58px, 6.3vw, 92px);
+  letter-spacing: -5px;
+  line-height: 1.01;
+  margin: 0;
+  font-weight: 600;
+}
+
+h2 {
+  font-size: clamp(42px, 4.9vw, 72px);
+  letter-spacing: -3.1px;
+  line-height: 1.06;
+  font-weight: 600;
+  margin: 0;
+}
+
+h3 {
+  font-size: 23px;
+  letter-spacing: -0.6px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0 0 16px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  margin: 0 0 23px;
+  color: #77777d;
+  line-height: 1.6;
+}
+
+.section-pad {
+  padding-left: max(7vw, 24px);
+  padding-right: max(7vw, 24px);
+}
+
+/* Buttons */
+.button {
+  background: var(--accent);
+  color: white;
+  border-radius: 40px;
+  padding: 16px 25px;
+  display: inline-flex;
+  gap: 22px;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition:
+    background 0.2s,
+    transform 0.2s;
+}
+
+.button:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+.button.small {
+  font-size: 13px;
+  padding: 10px 17px;
+  gap: 16px;
+}
+
+.text-button {
+  padding: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 17px;
+}
+
+.text-button span {
+  margin-left: 12px;
+}
+
+.skip {
+  position: fixed;
+  top: -100px;
+  left: 20px;
+  background: white;
+  padding: 16px;
+  z-index: 99;
+}
+
+.skip:focus {
+  top: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   Nav
+   -------------------------------------------------------------------------- */
+.nav {
+  height: 76px;
+  max-width: 1280px;
+  margin: auto;
+  padding: 0 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 10;
+  border-bottom: 1px solid #d9d9de80;
+}
+
+.brand {
+  font-size: 25px;
+  font-weight: 650;
+  letter-spacing: -1px;
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+
+.brand svg {
+  width: 31px;
+  height: 31px;
+}
+
+.nav nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  font-size: 13px;
+  font-weight: 450;
+}
+
+/* --------------------------------------------------------------------------
+   Hero — sticky stage; the lid closes as the section scrolls by
+   -------------------------------------------------------------------------- */
+.hero {
+  height: 190vh;
+  min-height: 1200px;
+  position: relative;
+}
+
+.hero-sticky {
+  height: calc(100svh - 20px);
+  min-height: 760px;
+  max-height: 1100px;
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-copy {
+  text-align: center;
+  padding-top: 42px;
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.hero-copy .eyebrow {
+  margin-bottom: 23px;
+}
+
+.tiny-fold {
+  font-size: 16px;
+  vertical-align: -1px;
+  margin-right: 7px;
+}
+
+h1 span {
+  background: linear-gradient(100deg, #2676be, #57a2b7 78%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-copy > p:not(.eyebrow) {
+  font-size: 19px;
+  line-height: 1.45;
+  margin: 20px 0 0;
+  color: var(--muted);
+  letter-spacing: -0.3px;
+}
+
+/* Takes whatever height is left under the copy, so text never overlaps the render.
+   Scroll-zoom grows from the bottom edge, so it can't creep upward into the copy. */
+.product-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  margin: 24px 0 70px;
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+.product-stage canvas {
+  display: block;
+  width: min(1080px, 100%);
+  height: 100%;
+  margin: auto;
+}
+
+.stage-caption {
+  position: absolute;
+  right: 7.5%;
+  top: 45%;
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.1px;
+  color: #818188;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 120px;
+  line-height: 1.6;
+}
+
+.caption-rule {
+  width: 28px;
+  flex-shrink: 0;
+  height: 1px;
+  background: #bbb;
+}
+
+.hero-bottom {
+  position: absolute;
+  bottom: 25px;
+  left: 48px;
+  right: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #88888f;
+  font-size: 11px;
+}
+
+.hero-bottom p {
+  margin: 0;
+}
+
+.scroll-cue {
+  letter-spacing: 1.5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.scroll-cue > span {
+  font-size: 20px;
+  color: #34343b;
+}
+
+.replay {
+  background: #e8e8ed;
+  color: #43434a;
+  border-radius: 30px;
+  padding: 12px 20px;
+  font-size: 13px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.replay:hover {
+  background: #dddde3;
+}
+
+.replay span {
+  font-size: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   Intro
+   -------------------------------------------------------------------------- */
+.intro {
+  padding-top: 130px;
+  padding-bottom: 150px;
+  max-width: 1450px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 90px;
+}
+
+.intro .eyebrow {
+  grid-column: 1 / -1;
+}
+
+.intro-description {
+  font-size: 23px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 4px 0 0;
+  letter-spacing: -0.5px;
+}
+
+/* --------------------------------------------------------------------------
+   Playground — dark interactive section
+   -------------------------------------------------------------------------- */
+.playground {
+  background: var(--dark-surface);
+  color: var(--paper);
+  padding-top: 105px;
+  padding-bottom: 45px;
+  overflow: hidden;
+}
+
+.playground .eyebrow {
+  color: #96969f;
+}
+
+.demo-heading {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.demo-heading > p {
+  color: #a0a0a8;
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 0 0 5px;
+}
+
+.demo-surface {
+  max-width: 1120px;
+  height: 570px;
+  position: relative;
+  margin: -5px auto -15px;
+}
+
+.demo-surface canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.angle-readout {
+  position: absolute;
+  right: 0;
+  top: 36%;
+  margin: 0;
+  font-size: 65px;
+  font-weight: 300;
+  color: #dedee2;
+  letter-spacing: -3px;
+}
+
+.angle-readout > span:nth-child(2) {
+  font-size: 34px;
+  vertical-align: top;
+  position: relative;
+  top: 5px;
+}
+
+.angle-readout small {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #87878f;
+  margin-top: 9px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  max-width: 870px;
+  margin: auto;
+}
+
+.presets {
+  background: var(--dark-control);
+  border-radius: 30px;
+  padding: 5px;
+  display: flex;
+  gap: 2px;
+}
+
+.presets button {
+  border-radius: 30px;
+  padding: 11px 24px;
+  color: #a8a8b0;
+  background: transparent;
+  font-size: 14px;
+  transition:
+    background 0.25s,
+    color 0.25s;
+}
+
+.presets button[aria-pressed="true"] {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.angle-control {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  font-size: 12px;
+  color: #aaaab2;
+  flex: 1;
+}
+
+.angle-control input {
+  width: 100%;
+  accent-color: #e0e0e5;
+  cursor: ew-resize;
+  min-width: 100px;
+}
+
+.round-button {
+  background: var(--dark-control);
+  color: white;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 25px;
+  flex-shrink: 0;
+}
+
+.demo-note {
+  text-align: center;
+  font-size: 12px;
+  color: #8d8d95;
+  margin-top: 28px;
+}
+
+/* --------------------------------------------------------------------------
+   Details
+   -------------------------------------------------------------------------- */
+.detail-grid {
+  max-width: 1450px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 65px;
+  padding-top: 115px;
+  padding-bottom: 135px;
+}
+
+.detail-icon {
+  font-size: 39px;
+  line-height: 1;
+  color: #888c94;
+  display: block;
+  margin-bottom: 33px;
+}
+
+.detail-grid p {
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Real world — photo
+   -------------------------------------------------------------------------- */
+.real-world {
+  background: #eaeaec;
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 65px;
+  align-items: center;
+  padding-top: 95px;
+  padding-bottom: 95px;
+}
+
+.real-copy h2 {
+  font-size: clamp(40px, 4.2vw, 62px);
+}
+
+.real-copy p:not(.eyebrow) {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 28px 0;
+}
+
+.real-world figure {
+  margin: 0;
+}
+
+.real-world img {
+  width: 100%;
+  height: 470px;
+  object-fit: cover;
+  object-position: 50% 55%;
+  border-radius: 20px;
+  display: block;
+}
+
+.real-world figcaption {
+  font-size: 12px;
+  color: #77777d;
+  margin: 16px 0 0;
+}
+
+/* --------------------------------------------------------------------------
+   Get iFold
+   -------------------------------------------------------------------------- */
+.get {
+  text-align: center;
+  padding-top: 135px;
+  padding-bottom: 125px;
+  background: #fff;
+}
+
+.app-icon {
+  background: linear-gradient(135deg, #353b43, #111418);
+  border: 1px solid #4d5156;
+  box-shadow:
+    0 6px 10px #0002,
+    inset 0 1px 1px #ffffff5c;
+  color: white;
+  width: 86px;
+  height: 86px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 32px;
+}
+
+.app-icon svg {
+  width: 57px;
+  height: 57px;
+}
+
+.get .eyebrow {
+  letter-spacing: 1.5px;
+}
+
+.get h2 {
+  font-size: clamp(50px, 5.5vw, 78px);
+}
+
+.get > p:not(.eyebrow):not(.compatibility) {
+  color: var(--muted);
+  font-size: 21px;
+  margin: 25px 0 30px;
+}
+
+.compatibility {
+  font-size: 12px;
+  color: #86868b;
+  margin: 24px 0 0;
+}
+
+.compatibility span {
+  padding: 0 8px;
+}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+footer {
+  max-width: 1280px;
+  padding: 34px 48px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+footer .brand {
+  font-size: 20px;
+}
+
+footer p,
+footer > span {
+  font-size: 12px;
+  color: #86868b;
+}
+
+footer > span {
+  margin-left: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Dialogs
+   -------------------------------------------------------------------------- */
+dialog {
+  border: 0;
+  border-radius: 24px;
+  padding: 48px;
+  background: #fff;
+  color: var(--ink);
+  width: min(600px, calc(100% - 32px));
+  max-height: 90svh;
+  box-shadow: 0 30px 100px #0005;
+}
+
+dialog::backdrop {
+  background: #0008;
+  backdrop-filter: blur(12px);
+}
+
+dialog h2 {
+  font-size: 40px;
+  letter-spacing: -1.8px;
+}
+
+dialog h3 {
+  font-size: 18px;
+  margin: 25px 0 10px;
+}
+
+dialog p,
+dialog li {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+dialog li {
+  margin-bottom: 8px;
+}
+
+dialog ul {
+  padding-left: 18px;
+}
+
+.dialog-close {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  border-radius: 50%;
+  background: #eeeef1;
+  color: #63636a;
+  width: 32px;
+  height: 32px;
+  font-size: 23px;
+}
+
+pre {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--paper);
+  padding: 16px;
+  border-radius: 12px;
+  gap: 10px;
+  font-size: 14px;
+}
+
+pre button {
+  background: transparent;
+  color: var(--accent);
+  font-size: 13px;
+}
+
+.privacy-note {
+  border-left: 2px solid #bbb;
+  padding-left: 15px;
+}
+
+#photo-dialog {
+  width: min(1050px, calc(100% - 32px));
+  padding: 20px;
+}
+
+#photo-dialog img {
+  width: 100%;
+  height: auto;
+  max-height: 75svh;
+  object-fit: contain;
+  display: block;
+  border-radius: 12px;
+}
+
+#photo-dialog p {
+  text-align: center;
+  margin-bottom: 0;
+}
+
+/* --------------------------------------------------------------------------
+   404
+   -------------------------------------------------------------------------- */
+.not-found {
+  min-height: 100svh;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding: 40px 24px;
+}
+
+.not-found h1 {
+  font-size: clamp(48px, 7vw, 80px);
+  letter-spacing: -3px;
+}
+
+.not-found p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: 19px;
+  margin: 20px 0 32px;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+@media (min-width: 1600px) {
+  .hero-copy {
+    padding-top: 55px;
+  }
+}
+
+@media (max-width: 900px) {
+  .nav {
+    padding: 0 25px;
+  }
+
+  .nav nav {
+    gap: 22px;
+  }
+
+  .hero-copy {
+    padding-top: 50px;
+  }
+
+  h1 {
+    font-size: 72px;
+    letter-spacing: -4px;
+  }
+
+  .stage-caption {
+    display: none;
+  }
+
+  .intro {
+    column-gap: 35px;
+  }
+
+  .intro-description {
+    font-size: 20px;
+  }
+
+  .demo-surface {
+    height: 480px;
+  }
+
+  .angle-readout {
+    font-size: 45px;
+    top: 10%;
+    right: 10px;
+  }
+
+  .controls {
+    gap: 18px;
+  }
+
+  .presets button {
+    padding: 10px 18px;
+  }
+
+  .detail-grid {
+    gap: 32px;
+  }
+
+  .real-world {
+    gap: 35px;
+  }
+
+  .real-world img {
+    height: 400px;
+  }
+
+  .demo-heading > p {
+    max-width: 250px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .nav {
+    height: 66px;
+    padding: 0 22px;
+  }
+
+  .nav nav > a:not(.button) {
+    display: none;
+  }
+
+  .brand {
+    font-size: 23px;
+  }
+
+  .button.small {
+    font-size: 12px;
+  }
+
+  .hero {
+    height: 155vh;
+    min-height: 1030px;
+  }
+
+  .hero-sticky {
+    min-height: 680px;
+    height: calc(100svh - 15px);
+  }
+
+  .hero-copy {
+    padding: 65px 15px 0;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 1.6px;
+    margin-bottom: 22px;
+  }
+
+  h1 {
+    font-size: clamp(36px, 9.6vw, 65px);
+    letter-spacing: -2.2px;
+    line-height: 1.06;
+  }
+
+  .hero-copy > p:not(.eyebrow) {
+    font-size: 17px;
+    margin-top: 22px;
+  }
+
+  /* Let the render bleed past the edges so the MacBook stays large */
+  .product-stage {
+    margin: 10px -90px 70px;
+  }
+
+  .hero-bottom {
+    bottom: 25px;
+    left: 22px;
+    right: 22px;
+  }
+
+  .scroll-cue {
+    font-size: 9px;
+    letter-spacing: 1px;
+    gap: 8px;
+  }
+
+  .replay {
+    font-size: 12px;
+    padding: 11px 14px;
+    gap: 9px;
+  }
+
+  .mac-label {
+    display: none;
+  }
+
+  .intro {
+    display: block;
+    padding-top: 90px;
+    padding-bottom: 90px;
+  }
+
+  .intro h2 {
+    font-size: 49px;
+  }
+
+  .intro-description {
+    font-size: 19px;
+    margin-top: 28px;
+    line-height: 1.55;
+  }
+
+  .intro-description br {
+    display: none;
+  }
+
+  h2 {
+    letter-spacing: -2px;
+  }
+
+  .playground {
+    padding-top: 65px;
+    padding-bottom: 35px;
+  }
+
+  .demo-heading {
+    display: block;
+  }
+
+  .demo-heading h2 {
+    font-size: 49px;
+  }
+
+  .demo-heading > p {
+    margin-top: 22px;
+    max-width: 100%;
+  }
+
+  .demo-surface {
+    height: 350px;
+    width: calc(100% + 95px);
+    margin: 15px -48px 0;
+  }
+
+  .angle-readout {
+    right: 52px;
+    top: 10px;
+    font-size: 35px;
+  }
+
+  .angle-readout > span:nth-child(2) {
+    font-size: 20px;
+    top: 2px;
+  }
+
+  .angle-readout small {
+    font-size: 8px;
+    letter-spacing: 1.2px;
+  }
+
+  .controls {
+    flex-wrap: wrap;
+    gap: 22px 15px;
+  }
+
+  .presets {
+    order: 0;
+  }
+
+  .round-button {
+    order: 1;
+  }
+
+  .angle-control {
+    flex-basis: 100%;
+    order: 2;
+    padding: 0 8px;
+  }
+
+  .presets button {
+    padding: 11px 25px;
+  }
+
+  .demo-note {
+    font-size: 11px;
+    line-height: 1.5;
+    margin-top: 24px;
+  }
+
+  .detail-grid {
+    display: block;
+    padding-top: 70px;
+    padding-bottom: 75px;
+  }
+
+  .detail-grid article + article {
+    margin-top: 50px;
+  }
+
+  .detail-icon {
+    margin-bottom: 20px;
+    font-size: 35px;
+  }
+
+  .detail-grid h3 {
+    font-size: 24px;
+  }
+
+  .real-world {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding-top: 65px;
+    padding-bottom: 50px;
+    gap: 40px;
+  }
+
+  .real-copy h2 {
+    font-size: 48px;
+  }
+
+  .real-world img {
+    height: auto;
+    aspect-ratio: 1.12;
+  }
+
+  .get {
+    padding-top: 85px;
+    padding-bottom: 80px;
+  }
+
+  .get h2 {
+    font-size: 52px;
+  }
+
+  .get > p:not(.eyebrow):not(.compatibility) {
+    font-size: 18px;
+  }
+
+  .compatibility {
+    font-size: 11px;
+    line-height: 1.7;
+    max-width: 250px;
+    margin: 23px auto 0;
+  }
+
+  footer {
+    padding: 30px 24px;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  footer p {
+    margin-left: auto;
+  }
+
+  footer > span {
+    flex-basis: 100%;
+    text-align: center;
+    font-size: 11px;
+    margin-top: 3px;
+  }
+
+  dialog {
+    padding: 40px 25px;
+  }
+
+  dialog h2 {
+    font-size: 35px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion — no scroll-driven animation, static hero
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero {
+    height: auto;
+    min-height: 0;
+  }
+
+  .hero-sticky {
+    position: relative;
+  }
+
+  .button,
+  .presets button {
+    transition: none;
+  }
+}

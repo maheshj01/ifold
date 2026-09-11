@@ -162,6 +162,12 @@ gh release create v1.0.0 dist/iFold.dmg dist/SHA256SUMS --title "iFold 1.0.0" --
 The asset is always named `iFold.dmg` so the
 `releases/latest/download/iFold.dmg` link in this README keeps working.
 
+## Website
+
+The product site lives in [`site/`](site/) (plain HTML/CSS/JS, no build step) and is
+published to GitHub Pages at https://maheshj01.github.io/ifold/ by
+`.github/workflows/pages.yml`. See [`site/README.md`](site/README.md).
+
 ## How it works
 
 - `LidAngleSensor` — reads HID feature report #1 from the Apple sensor hub
