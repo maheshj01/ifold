@@ -82,6 +82,13 @@ final class FoldController: ObservableObject {
         #endif
         observeSystemEvents()
 
+        // Create the overlay window now (it stays ordered out until needed) so
+        // this app owns a window before any capture stream starts: the stream
+        // excludes our application, and that list is built from apps that have
+        // windows. Without this the exclusion is empty and only the window's
+        // sharingType keeps the capture from seeing the overlay.
+        if window == nil, let screen = Self.builtInScreen() { makeWindow(on: screen) }
+
         sensor.onAngle = { [weak self] angle in
             guard let self else { return }
             let now = CACurrentMediaTime()

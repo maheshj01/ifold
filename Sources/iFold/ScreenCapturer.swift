@@ -29,6 +29,8 @@ final class ScreenCapturer: NSObject, SCStreamOutput, SCStreamDelegate {
             throw CaptureError.displayNotFound
         }
         let ourselves = content.applications.filter { $0.processID == getpid() }
+        let ourWindows = content.windows.filter { $0.owningApplication?.processID == getpid() }
+        log.notice("capture filter: excluding \(ourselves.count) app(s) of ours; we own \(ourWindows.count) window(s): \(ourWindows.map { "\($0.windowID):\($0.title ?? "-")" }.joined(separator: ", "), privacy: .public)")
         let filter = SCContentFilter(display: display, excludingApplications: ourselves, exceptingWindows: [])
 
         // CGDisplayPixelsWide reports points on scaled Retina modes; use the
