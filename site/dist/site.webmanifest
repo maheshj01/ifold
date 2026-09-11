@@ -2,7 +2,7 @@
   "name": "iFold",
   "short_name": "iFold",
   "description": "A macOS app that bends your live desktop as you close your MacBook lid.",
-  "start_url": "/ifold/",
+  "start_url": "/",
   "display": "browser",
   "background_color": "#f5f5f7",
   "theme_color": "#f5f5f7",

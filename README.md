@@ -165,8 +165,7 @@ The asset is always named `iFold.dmg` so the
 ## Website
 
 The product site lives in [`site/`](site/) (plain HTML/CSS/JS, no build step) and is
-published to GitHub Pages at https://maheshj01.github.io/ifold/ by
-`.github/workflows/pages.yml`. See [`site/README.md`](site/README.md).
+deployed on Vercel from `site/dist`. See [`site/README.md`](site/README.md).
 
 ## How it works
 

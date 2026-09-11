@@ -14,14 +14,12 @@ Open http://127.0.0.1:4173. Any static file server works; the JavaScript uses ES
 
 ## Deploy
 
-`site/dist/` is the whole site. It is published to **GitHub Pages** at
-https://maheshj01.github.io/ifold/ by `.github/workflows/pages.yml` on every push to `main` that touches `site/`
-(one-time setup: repository **Settings → Pages → Source: GitHub Actions**).
+`site/dist/` is the whole site and is deployed on **Vercel**: project Root Directory `site/dist`,
+framework preset *Other*, no build command, no output directory. Every push to `main` redeploys.
 
-Because a project Pages site lives under the `/ifold/` sub-path, three files carry that base explicitly:
-`index.html` (`canonical`, `og:url`, `og:image`), `404.html` (stylesheet, icon and home link) and `site.webmanifest`
-(`start_url`). If the site moves to a custom domain, update those and nothing else — everything in `index.html`
-is otherwise path-relative and works on any static host (Netlify, Vercel, Cloudflare Pages: publish directory `site/dist`).
+Everything is path-relative or root-relative, so the same folder works unchanged on any static host
+(Netlify, Cloudflare Pages, GitHub Pages with a custom domain). Once the production domain is final, set the
+absolute `og:image` URL in `index.html` (and optionally `canonical` / `og:url`) so link previews render.
 
 ## Layout
 
