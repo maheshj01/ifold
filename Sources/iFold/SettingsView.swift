@@ -94,8 +94,15 @@ struct SettingsView: View {
 
     private var styleSection: some View {
         VStack(alignment: .leading, spacing: 10) {
+            Picker("Style", selection: $settings.style) {
+                ForEach(FoldStyle.allCases) { Text($0.title).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            Text(settings.style.blurb)
+                .font(.caption2).foregroundStyle(.tertiary)
             HStack {
-                Text("Style").font(.subheadline.weight(.semibold))
+                Text("Look").font(.subheadline.weight(.semibold))
                 Spacer()
                 ForEach(Settings.Style.allCases) { style in
                     Button(style.title) { settings.apply(style) }

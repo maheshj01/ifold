@@ -324,6 +324,7 @@ final class FoldController: ObservableObject {
         let eased = p * p * (3 - 2 * p)
 
         var pose = FoldPose()
+        pose.style = settings.style
         pose.tilt = max(0, tilt.x)
         pose.bend = settings.bend
         pose.shade = settings.shade

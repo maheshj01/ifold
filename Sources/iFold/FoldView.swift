@@ -2,9 +2,30 @@ import AppKit
 import QuartzCore
 import CoreVideo
 
+/// The motion the desktop performs as the lid comes down. Each is a different
+/// geometry for the same strip renderer; the spring, motion blur and frost
+/// apply to all of them, so they share one feel.
+enum FoldStyle: String, CaseIterable, Identifiable {
+    case fold, curl, genie, cube, scale, fade
+    var id: String { rawValue }
+    var title: String { rawValue.capitalized }
+    var blurb: String {
+        switch self {
+        case .fold:  return "Leans away from the hinge, like a sheet folding shut."
+        case .curl:  return "The top edge rolls over and away, like a page curling toward the hinge."
+        case .genie: return "Drawn down into the hinge, the way windows minimize into the Dock."
+        case .cube:  return "One face of a cube, turning with the lid."
+        case .scale: return "Shrinks toward the hinge and settles into the dark."
+        case .fade:  return "Dims and drains of colour, like a display drifting to sleep."
+        }
+    }
+}
+
 /// Everything the renderer needs for one frame.
 struct FoldPose {
-    /// Degrees the picture leans away from the viewer at the top edge.
+    var style: FoldStyle = .fold
+    /// Degrees the picture leans away from the viewer at the top edge (Fold);
+    /// the other styles read it as progress, 0 … `FoldPose.fullTilt`.
     var tilt: Double = 0
     /// 0 = rigid plank hinged at the bottom, 1 = flat at the hinge, curling to `tilt` at the top.
     var bend: Double = 0.5
@@ -18,9 +39,12 @@ struct FoldPose {
     var frost: Double = 0
 
     static let flat = FoldPose()
+    /// Tilt at which every style has reached its final shape.
+    static let fullTilt: Double = 80
+    var progress: Double { min(1, max(0, tilt / Self.fullTilt)) }
 
     func isVisuallyEqual(to o: FoldPose) -> Bool {
-        abs(tilt - o.tilt) < 0.004 && abs(bend - o.bend) < 0.001 && abs(shade - o.shade) < 0.001
+        style == o.style && abs(tilt - o.tilt) < 0.004 && abs(bend - o.bend) < 0.001 && abs(shade - o.shade) < 0.001
             && abs(sheen - o.sheen) < 0.001 && abs(motionBlur - o.motionBlur) < 0.05 && abs(frost - o.frost) < 0.05
     }
 }
@@ -42,13 +66,32 @@ struct FoldPose {
 final class FoldView: NSView {
     private let container = CALayer()
     private var strips: [Strip] = []
+    /// Cube: the face that swings into view under the desktop as the cube turns.
+    private let cubeFace = CAGradientLayer()
+    /// Genie: strips can only scale as rectangles, so their narrowing edges
+    /// step; this screen-space silhouette clips the steps to a smooth funnel.
+    private let funnelMask = CAShapeLayer()
     private let motionBlur = CIFilter(name: "CIMotionBlur")!
     private let frostBlur = CIFilter(name: "CIGaussianBlur")!
-    private var filtersInstalled = false
+    private let tone = CIFilter(name: "CIColorControls")! // Fade: desaturation
+    private var installedFilters = 0
     private var currentBuffer: CVPixelBuffer?
     private(set) var pose = FoldPose.flat
 
-    static let stripCount = 18
+    /// Layers are allocated for the finest style; each style uses only what it
+    /// needs (every active strip is re-fed on every captured frame, so fewer is
+    /// cheaper): Curl and Genie bend sharply and need fine slicing, Fold is a
+    /// gentle curve, the rigid styles only need enough strips for their shading.
+    static let stripCount = 64
+    private var activeCount = 18
+    private static func stripCount(for style: FoldStyle) -> Int {
+        switch style {
+        case .curl, .genie: return 64
+        case .fold: return 18
+        case .cube, .scale, .fade: return 8
+        }
+    }
+    private var currentSurface: IOSurfaceRef?
 
     private struct Strip {
         let layer = CALayer()
@@ -77,6 +120,16 @@ final class FoldView: NSView {
         motionBlur.setValue(Double.pi / 2, forKey: kCIInputAngleKey) // smear along the fold direction
         frostBlur.name = "frost"
         frostBlur.setValue(0, forKey: kCIInputRadiusKey)
+        tone.name = "tone"
+        tone.setValue(1, forKey: kCIInputSaturationKey)
+
+        cubeFace.anchorPoint = CGPoint(x: 0.5, y: 0)
+        cubeFace.startPoint = CGPoint(x: 0.5, y: 0)
+        cubeFace.endPoint = CGPoint(x: 0.5, y: 1)
+        cubeFace.colors = [NSColor(white: 0.16, alpha: 1).cgColor, NSColor(white: 0.03, alpha: 1).cgColor]
+        cubeFace.isHidden = true
+        container.addSublayer(cubeFace) // behind the strips
+        funnelMask.fillColor = NSColor.black.cgColor
 
         for _ in 0..<Self.stripCount {
             let s = Strip()
@@ -107,23 +160,48 @@ final class FoldView: NSView {
             container.frame = bounds
             let scale = window?.backingScaleFactor ?? 2
             container.contentsScale = scale
-            let n = CGFloat(Self.stripCount)
-            let h = bounds.height / n
-            for (i, s) in strips.enumerated() {
-                // Overlap each strip a hair into the next so rounding never opens a gap.
-                let overlap: CGFloat = i == strips.count - 1 ? 0 : 0.5
-                s.layer.bounds = CGRect(x: 0, y: 0, width: bounds.width, height: h + overlap)
-                s.layer.position = CGPoint(x: bounds.midX, y: 0)
-                s.layer.contentsRect = CGRect(x: 0, y: CGFloat(i) / n, width: 1, height: (h + overlap) / bounds.height)
-                s.layer.contentsScale = scale
-                for g in [s.shade, s.sheen] {
-                    g.frame = s.layer.bounds
-                    g.contentsScale = scale
-                }
-            }
+            layoutStrips()
+            cubeFace.bounds = CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height)
+            cubeFace.position = CGPoint(x: bounds.midX, y: 0)
+            cubeFace.contentsScale = scale
+            funnelMask.frame = container.bounds
+            funnelMask.contentsScale = scale
             updatePerspective()
             applyPose(pose)
         }
+    }
+
+    /// Slices the desktop into `activeCount` strips; the rest are hidden and
+    /// receive no frames.
+    private func layoutStrips() {
+        let scale = window?.backingScaleFactor ?? 2
+        let n = CGFloat(activeCount)
+        let h = bounds.height / n
+        for (i, s) in strips.enumerated() {
+            let active = i < activeCount
+            s.layer.isHidden = !active
+            guard active else { continue }
+            // Overlap each strip a hair into the next so rounding never opens a gap.
+            let overlap: CGFloat = i == activeCount - 1 ? 0 : 0.5
+            s.layer.bounds = CGRect(x: 0, y: 0, width: bounds.width, height: h + overlap)
+            s.layer.position = CGPoint(x: bounds.midX, y: 0)
+            s.layer.contentsRect = CGRect(x: 0, y: CGFloat(i) / n, width: 1, height: (h + overlap) / bounds.height)
+            s.layer.contentsScale = scale
+            s.layer.contents = currentSurface
+            for g in [s.shade, s.sheen] {
+                g.frame = s.layer.bounds
+                g.contentsScale = scale
+            }
+        }
+    }
+
+    /// Where a point in the container's 3D space lands after the perspective
+    /// in `sublayerTransform` (x relative to the horizontal centre).
+    private func project(x: Double, y: Double, z: Double) -> CGPoint {
+        let d = Double(max(perspectiveDistance, 200))
+        let ax = Double(bounds.midX), ay = Double(bounds.height) * Double(container.anchorPoint.y)
+        let k = 1 / (1 - z / d)
+        return CGPoint(x: ax + x * k, y: ay + (y - ay) * k)
     }
 
     private func updatePerspective() {
@@ -137,13 +215,15 @@ final class FoldView: NSView {
     func display(_ buffer: CVPixelBuffer) {
         guard let surface = CVPixelBufferGetIOSurface(buffer)?.takeUnretainedValue() else { return }
         currentBuffer = buffer
-        withoutAnimation { for s in strips { s.layer.contents = surface } }
+        currentSurface = surface
+        withoutAnimation { for s in strips.prefix(activeCount) { s.layer.contents = surface } }
     }
 
     var hasFrame: Bool { currentBuffer != nil }
 
     func clearFrame() {
         currentBuffer = nil
+        currentSurface = nil
         withoutAnimation { for s in strips { s.layer.contents = nil } }
     }
 
@@ -159,54 +239,170 @@ final class FoldView: NSView {
     }
     private var appliedOnce = false
 
-    /// Lean angle (radians) of the sheet at normalised height u ∈ [0, 1].
+    /// Lean angle (radians) of the Fold sheet at normalised height u ∈ [0, 1].
     private func lean(at u: Double, pose p: FoldPose) -> Double {
         let profile = (1 - p.bend) + p.bend * pow(u, 1.4)
         return p.tilt * profile * .pi / 180
     }
 
+    /// Curl: the roll tightens toward the top, so the sheet starts as a page
+    /// curl and ends rolled up like a scroll behind itself.
+    private func curl(at u: Double, pose p: FoldPose) -> Double {
+        let tiltRad = p.tilt * .pi / 180
+        return tiltRad * (0.2 * u + 2.6 * pow(u, 2.4))
+    }
+
     private func applyPose(_ p: FoldPose) {
-        let n = strips.count
-        let h = Double(bounds.height) / Double(n)
-        var y = 0.0, z = 0.0
-        for (i, s) in strips.enumerated() {
+        let wanted = Self.stripCount(for: p.style)
+        if wanted != activeCount {
+            activeCount = wanted
+            layoutStrips()
+        }
+        let n = activeCount
+        let H = Double(bounds.height)
+        let h = H / Double(n)
+        let prog = p.progress
+        let tiltRad = p.tilt * .pi / 180
+
+        // Per-style geometry: the facing angle at height u (drives shading and
+        // the sheen), extra darkening at u, and the strip transforms.
+        var phiAt: (Double) -> Double = { _ in 0 }
+        var dimAt: (Double) -> Double = { _ in 0 }
+        var transforms: [CATransform3D] = []
+        transforms.reserveCapacity(n)
+
+        switch p.style {
+        case .fold, .curl:
+            phiAt = p.style == .fold ? { self.lean(at: $0, pose: p) } : { self.curl(at: $0, pose: p) }
+            var y = 0.0, z = 0.0
+            for i in 0..<n {
+                let phi = phiAt((Double(i) + 0.5) / Double(n))
+                var t = CATransform3DMakeTranslation(0, CGFloat(y), CGFloat(z))
+                t = CATransform3DRotate(t, -CGFloat(phi), 1, 0, 0) // negative: top edge recedes
+                transforms.append(t)
+                y += h * cos(phi)
+                z -= h * sin(phi)
+            }
+
+        case .genie:
+            // The hinge end narrows into a neck first; the whole sheet is then
+            // pulled down through it. A little lean gives the funnel depth.
+            let phi = tiltRad * 0.3
+            phiAt = { _ in phi }
+            dimAt = { _ in 0.3 * prog }
+            var y = 0.0, z = 0.0
+            let W = Double(bounds.width)
+            var left: [CGPoint] = [project(x: -W / 2 * (1 - 0.97 * prog), y: 0, z: 0)]
+            var right: [CGPoint] = [project(x: W / 2 * (1 - 0.97 * prog), y: 0, z: 0)]
+            for i in 0..<n {
+                let u = (Double(i) + 0.5) / Double(n)
+                let sx = 1 - 0.97 * prog * pow(1 - u, 1.35)
+                let sy = (1 - 0.65 * prog) * (1 - 0.45 * prog * (1 - u))
+                var t = CATransform3DMakeTranslation(0, CGFloat(y), CGFloat(z))
+                t = CATransform3DRotate(t, -CGFloat(phi), 1, 0, 0)
+                t = CATransform3DScale(t, CGFloat(sx), CGFloat(sy), 1)
+                transforms.append(t)
+                y += h * sy * cos(phi)
+                z -= h * sy * sin(phi)
+                // Silhouette through each strip's *top* corners: the wider strip
+                // above overhangs here, and the mask trims that overhang away.
+                left.append(project(x: -W / 2 * sx, y: y, z: z))
+                right.append(project(x: W / 2 * sx, y: y, z: z))
+            }
+            let path = CGMutablePath()
+            path.move(to: left[0])
+            for pt in left.dropFirst() { path.addLine(to: pt) }
+            for pt in right.reversed() { path.addLine(to: pt) }
+            path.closeSubpath()
+            funnelMask.path = path
+
+        case .cube:
+            // Rigid rotation about the cube's centre (half a screen behind the
+            // glass), shrunk a little mid-turn so the face stays on screen.
+            let theta = tiltRad
+            let s = 1 - 0.22 * sin(theta)
+            phiAt = { _ in theta }
+            dimAt = { u in 0.15 * prog * u }
+            var base = CATransform3DMakeTranslation(0, CGFloat(H / 2), CGFloat(-H / 2))
+            base = CATransform3DScale(base, CGFloat(s), CGFloat(s), CGFloat(s))
+            base = CATransform3DRotate(base, -CGFloat(theta), 1, 0, 0)
+            base = CATransform3DTranslate(base, 0, CGFloat(-H / 2), CGFloat(H / 2))
+            for i in 0..<n {
+                transforms.append(CATransform3DTranslate(base, 0, CGFloat(Double(i) * h), 0))
+            }
+            // The cube's underside: the same square, folded 90° back from the hinge edge.
+            cubeFace.transform = CATransform3DRotate(base, -.pi / 2, 1, 0, 0)
+
+        case .scale:
+            let s = 1 - 0.78 * prog
+            let phi = tiltRad * 0.18
+            phiAt = { _ in phi }
+            dimAt = { _ in 0.5 * prog }
+            for i in 0..<n {
+                let y = Double(i) * h * s
+                var t = CATransform3DMakeTranslation(0, CGFloat(y * cos(phi)), CGFloat(-y * sin(phi)))
+                t = CATransform3DRotate(t, -CGFloat(phi), 1, 0, 0)
+                t = CATransform3DScale(t, CGFloat(s), CGFloat(s), 1)
+                transforms.append(t)
+            }
+
+        case .fade:
+            let phi = tiltRad * 0.1
+            phiAt = { _ in phi }
+            dimAt = { u in min(1, prog * (0.25 + 0.95 * u)) }
+            for i in 0..<n {
+                let y = Double(i) * h
+                var t = CATransform3DMakeTranslation(0, CGFloat(y * cos(phi)), CGFloat(-y * sin(phi)))
+                t = CATransform3DRotate(t, -CGFloat(phi), 1, 0, 0)
+                transforms.append(t)
+            }
+        }
+
+        cubeFace.isHidden = !(p.style == .cube && prog > 0.001)
+        let wantMask = p.style == .genie && prog > 0.001
+        if wantMask != (container.mask != nil) { container.mask = wantMask ? funnelMask : nil }
+
+        for (i, s) in strips.prefix(n).enumerated() {
             let u0 = Double(i) / Double(n), u1 = Double(i + 1) / Double(n)
-            let phi = lean(at: (u0 + u1) / 2, pose: p)
-
-            var t = CATransform3DMakeTranslation(0, CGFloat(y), CGFloat(z))
-            t = CATransform3DRotate(t, -CGFloat(phi), 1, 0, 0) // negative: top edge recedes
-            s.layer.transform = t
-            y += h * cos(phi)
-            z -= h * sin(phi)
-
-            s.shade.colors = [shadeColor(u: u0, pose: p), shadeColor(u: u1, pose: p)]
-            s.sheen.colors = [sheenColor(u: u0, pose: p), sheenColor(u: u1, pose: p)]
+            s.layer.transform = transforms[i]
+            s.shade.colors = [shadeColor(phi: phiAt(u0), u: u0, dim: dimAt(u0), pose: p),
+                              shadeColor(phi: phiAt(u1), u: u1, dim: dimAt(u1), pose: p)]
+            s.sheen.colors = [sheenColor(phi: phiAt(u0), pose: p), sheenColor(phi: phiAt(u1), pose: p)]
         }
 
-        let wantFilters = p.motionBlur > 0.25 || p.frost > 0.25
-        if wantFilters != filtersInstalled {
-            container.filters = wantFilters ? [motionBlur, frostBlur] : nil
-            filtersInstalled = wantFilters
+        // Filters live on the container; install only what this frame needs.
+        let wantBlur = p.motionBlur > 0.25 || p.frost > 0.25
+        let wantTone = p.style == .fade && prog > 0.01
+        let key = (wantBlur ? 1 : 0) | (wantTone ? 2 : 0)
+        if key != installedFilters {
+            var f: [CIFilter] = []
+            if wantBlur { f += [motionBlur, frostBlur] }
+            if wantTone { f.append(tone) }
+            container.filters = f.isEmpty ? nil : f
+            installedFilters = key
         }
-        if wantFilters {
+        if wantBlur {
             container.setValue(p.motionBlur, forKeyPath: "filters.mblur.inputRadius")
             container.setValue(p.frost, forKeyPath: "filters.frost.inputRadius")
+        }
+        if wantTone {
+            container.setValue(1 - 0.9 * prog, forKeyPath: "filters.tone.inputSaturation")
         }
     }
 
     /// Lambert-ish falloff: the further a slice turns away, the darker; plus a
-    /// gentle distance fade so the far edge sits back in the void.
-    private func shadeColor(u: Double, pose p: FoldPose) -> CGColor {
-        let phi = lean(at: u, pose: p)
-        let facing = 1 - cos(phi)                    // 0 flat … 1 edge-on
-        let a = p.shade * min(1, facing * 1.6 + 0.35 * u * sin(phi))
+    /// gentle distance fade so the far edge sits back in the void. Strips that
+    /// have rolled past edge-on (Curl) show their back, dimmed like paper.
+    private func shadeColor(phi: Double, u: Double, dim: Double, pose p: FoldPose) -> CGColor {
+        let facing = min(1, max(0, 1 - cos(phi)))     // 0 flat … 1 edge-on or beyond
+        let a = min(1, p.shade * min(1, facing * 1.6 + 0.35 * u * sin(phi)) + dim)
         return NSColor.black.withAlphaComponent(a).cgColor
     }
 
     /// A soft highlight band that lives where the surface leans ~28° toward
     /// the light, so it sweeps along the sheet as it bends.
-    private func sheenColor(u: Double, pose p: FoldPose) -> CGColor {
-        let deg = lean(at: u, pose: p) * 180 / .pi
+    private func sheenColor(phi: Double, pose p: FoldPose) -> CGColor {
+        let deg = phi * 180 / .pi
         let band = exp(-pow((deg - 28) / 16, 2))
         let a = 0.14 * p.sheen * band * min(1, p.tilt / 12)
         return NSColor.white.withAlphaComponent(a).cgColor
@@ -222,7 +418,7 @@ final class FoldView: NSView {
     var stateDescription: String {
         let bw = currentBuffer.map { CVPixelBufferGetWidth($0) } ?? 0
         let bh = currentBuffer.map { CVPixelBufferGetHeight($0) } ?? 0
-        return "view=\(bounds.size) tilt=\(pose.tilt) bend=\(pose.bend) mblur=\(pose.motionBlur) frost=\(pose.frost) shade=\(pose.shade) filters=\(filtersInstalled) buffer=\(bw)x\(bh)"
+        return "view=\(bounds.size) style=\(pose.style.rawValue) tilt=\(pose.tilt) bend=\(pose.bend) mblur=\(pose.motionBlur) frost=\(pose.frost) shade=\(pose.shade) filters=\(installedFilters) buffer=\(bw)x\(bh)"
     }
 
     // MARK: Input — a click pauses the effect until the lid opens again.

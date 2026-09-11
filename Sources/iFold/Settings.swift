@@ -3,12 +3,15 @@ import Combine
 
 /// User-tunable parameters, persisted to UserDefaults.
 final class Settings: ObservableObject {
+    /// A look: a preset of the sliders, layered on whichever style is chosen.
     enum Style: String, CaseIterable, Identifiable {
         case silk, shade, frost
         var id: String { rawValue }
         var title: String { rawValue.capitalized }
     }
 
+    /// The motion the desktop performs (Fold, Curl, Genie, Cube, Scale, Fade).
+    @Published var style: FoldStyle { didSet { save() } }
     /// Lid angle (degrees) at or above which the desktop is flat and the overlay is gone.
     @Published var clearAngle: Double { didSet { save() } }
     /// Multiplier from "degrees the lid has dropped" to "degrees the picture leans".
@@ -30,6 +33,7 @@ final class Settings: ObservableObject {
 
     init() {
         let d = UserDefaults.standard
+        style = FoldStyle(rawValue: d.string(forKey: "style") ?? "") ?? .fold
         clearAngle = d.object(forKey: "clearAngle") as? Double ?? 100
         perspective = d.object(forKey: "perspective") as? Double ?? 1.0
         bend = d.object(forKey: "bend") as? Double ?? 0.55
@@ -50,6 +54,7 @@ final class Settings: ObservableObject {
     }
 
     private func save() {
+        defaults.set(style.rawValue, forKey: "style")
         defaults.set(clearAngle, forKey: "clearAngle")
         defaults.set(perspective, forKey: "perspective")
         defaults.set(bend, forKey: "bend")

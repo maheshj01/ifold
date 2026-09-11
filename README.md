@@ -78,6 +78,7 @@ angle and lets you tune everything about the fold:
 
 | Control      | What it does                                                         |
 |--------------|----------------------------------------------------------------------|
+| Style        | The motion itself — see below.                                        |
 | Follow lid / Manual | Track the real hinge, or drag the angle yourself to preview.  |
 | Clears at    | Hinge angle at which the desktop is flat again (default 100°).        |
 | Perspective  | How far the picture leans per degree of lid travel.                   |
@@ -85,7 +86,20 @@ angle and lets you tune everything about the fold:
 | Motion blur  | Directional smear while the lid is moving; crisp once it settles.     |
 | Frost        | Static blur that builds as the lid comes down.                        |
 | Shade        | Lighting falloff on the parts of the sheet facing away.               |
-| Silk / Shade / Frost | Presets.                                                      |
+| Silk / Shade / Frost | Looks: presets for the sliders above, on whichever style is chosen. |
+
+### Styles
+
+Six motions, all riding the same spring, motion blur and frost:
+
+| Style | As the lid comes down… |
+|---|---|
+| **Fold** | The desktop leans away from the hinge, curling toward the top. The default. |
+| **Curl** | The top edge rolls over and away, like a page curling toward the hinge. |
+| **Genie** | The desktop is drawn down into the hinge, the way windows minimize into the Dock. |
+| **Cube** | The desktop is one face of a cube turning with the lid; the underside swings into view. |
+| **Scale** | The desktop shrinks toward the hinge and settles into the dark. |
+| **Fade** | The desktop dims and drains of colour, like a display drifting to sleep. |
 
 Click anywhere on the bent desktop to pause until the lid opens again.
 
@@ -191,7 +205,7 @@ the same command notarizes and staples both the app and the DMG. The asset is al
   (VID 0x05AC, PID 0x8104, Sensor/Orientation usage). Public IOKit only.
 - `ScreenCapturer` — ScreenCaptureKit stream of the built-in display,
   excluding iFold Mac's own windows.
-- `FoldView` — the desktop as a flexible sheet: 18 horizontal strips
+- `FoldView` — the desktop as a flexible sheet: horizontal strips (8–64 depending on the style)
   (IOSurface contents + `contentsRect`) chained end to end and rotated
   progressively so the surface curves away from the hinge, under a perspective
   `sublayerTransform`. Each strip carries a Lambert-style shade gradient and a
