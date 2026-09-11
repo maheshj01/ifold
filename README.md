@@ -147,26 +147,30 @@ notifyutil -p com.wml.ifold.demo
 
 ## Releasing (maintainers)
 
-```bash
-./release.sh            # → dist/iFold.dmg + dist/SHA256SUMS
-```
+1. Bump `CFBundleShortVersionString` in `Resources/Info.plist` (and the version/size line in
+   `site/dist/index.html`'s download dialog), commit, push.
+2. Publish:
 
-Builds, signs, lays out the DMG (app + Applications shortcut), and — if a
-*Developer ID Application* identity and a `notarytool` keychain profile named
-`ifold` exist — notarizes and staples both the app and the DMG. Then:
+   ```bash
+   ./release.sh --publish
+   ```
 
-```bash
-git tag v1.0.0 && git push --tags
-gh release create v1.0.0 dist/iFold.dmg dist/SHA256SUMS --title "iFold 1.0.0" --notes-file notes.md
-```
+   Builds, signs, lays out `dist/iFold.dmg`, tags `v<version>`, pushes the tag, creates the GitHub
+   release (or replaces the assets if the release for this commit already exists), uploads
+   `iFold.dmg` + `SHA256SUMS`, then downloads the DMG back through the public
+   `releases/latest/download/iFold.dmg` link and fails if the checksum doesn't match.
+   It refuses to run on a dirty tree, an unpushed HEAD, or a version that's already tagged at
+   another commit. Add `--dry-run` to see the steps without tagging or uploading.
 
-The asset is always named `iFold.dmg` so the
-`releases/latest/download/iFold.dmg` link in this README keeps working.
+3. Any time, confirm what GitHub is actually serving:
 
-## Website
+   ```bash
+   ./release.sh --check
+   ```
 
-The product site lives in [`site/`](site/) (plain HTML/CSS/JS, no build step) and is
-deployed on Vercel from `site/dist`. See [`site/README.md`](site/README.md).
+If a *Developer ID Application* identity and a `notarytool` keychain profile named `ifold` exist,
+the same command notarizes and staples both the app and the DMG. The asset is always named
+`iFold.dmg` so the download links in this README and on the website keep working.
 
 ## How it works
 
