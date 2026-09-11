@@ -5,9 +5,11 @@ struct iFoldApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        MenuBarExtra("iFold Mac", systemImage: "laptopcomputer") {
+        MenuBarExtra {
             SettingsView(settings: FoldController.shared.settings)
                 .environmentObject(FoldController.shared)
+        } label: {
+            Image(nsImage: MenuBarIcon.image)
         }
         .menuBarExtraStyle(.window)
     }

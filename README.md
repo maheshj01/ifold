@@ -1,3 +1,5 @@
+<p align="center"><img src="brand/ifold-mark-tile.svg" width="112" alt="iFold Mac"></p>
+
 # iFold Mac
 
 [![Release](https://img.shields.io/github/v/release/maheshj01/ifold-mac?display_name=tag)](https://github.com/maheshj01/ifold-mac/releases/latest)

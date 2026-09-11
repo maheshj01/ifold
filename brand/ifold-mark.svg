@@ -1,11 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="220 312 584 400" width="584" height="400">
   <defs>
     <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A2C36"/><stop offset="1" stop-color="#0E0F14"/></linearGradient>
     <linearGradient id="wall" gradientUnits="userSpaceOnUse" x1="240" y1="340" x2="784" y2="700"><stop offset="0" stop-color="#FF7A59"/><stop offset=".5" stop-color="#A360FF"/><stop offset="1" stop-color="#4AA4FF"/></linearGradient>
     <linearGradient id="back" gradientUnits="userSpaceOnUse" x1="784" y1="700" x2="240" y2="340"><stop offset="0" stop-color="#4AA4FF"/><stop offset=".5" stop-color="#A360FF"/><stop offset="1" stop-color="#FF7A59"/></linearGradient>
     <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter>
   </defs>
-  <rect x="92" y="92" width="840" height="840" rx="190" fill="url(#tile)"/>
   <!-- the screen, minus the corner that folds -->
   <path d="M284 332H740a44 44 0 0 1 44 44V442L534 692H284a44 44 0 0 1-44-44V376a44 44 0 0 1 44-44z" fill="url(#wall)"/>
   <!-- shadow the folded corner casts -->

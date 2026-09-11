@@ -24,8 +24,8 @@ struct SettingsView: View {
 
     private var header: some View {
         HStack {
-            Image(systemName: "laptopcomputer")
-                .font(.title2)
+            Image(nsImage: NSApp.applicationIconImage)
+                .resizable().frame(width: 30, height: 30)
             VStack(alignment: .leading, spacing: 2) {
                 Text("iFold Mac").font(.headline)
                 Text(statusLine).font(.caption).foregroundStyle(.secondary)
