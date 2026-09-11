@@ -740,6 +740,9 @@ pre button {
 /* Setup dialog: download action and the numbered install steps */
 .dialog-actions { margin: 26px 0 6px; }
 .download-meta { font-size: 13px; color: #86868b; margin: 14px 0 0; line-height: 1.6; }
+.sponsor-line { font-size: 14px; margin: 14px 0 0; }
+.sponsor-line a { color: var(--accent); font-weight: 500; }
+footer a.sponsor { color: var(--accent); margin-left: 10px; }
 dialog .steps { list-style: none; padding: 0; margin: 0; counter-reset: step; }
 dialog .steps li { position: relative; padding-left: 42px; margin-bottom: 18px; }
 dialog .steps li::before {

@@ -156,6 +156,8 @@ iPhone Duo's fold, for the MacBook lid you already have. iFold reads the hinge a
 
 Requires an Apple silicon MacBook with a lid-angle sensor (M2 Air and later, 14"/16" Pro) on macOS 14+. Illustrated steps: https://ifold-mac.vercel.app
 
+iFold is free and open source. If you enjoy it, [sponsoring](https://github.com/sponsors/maheshj01) funds the Apple Developer membership that will make the Gatekeeper step go away.
+
 `SHA-256 iFold.dmg`: `@SHA@`
 EON
 sed -i '' "s/@SHA@/$SHA/" "$NOTES"

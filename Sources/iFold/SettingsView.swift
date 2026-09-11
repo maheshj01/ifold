@@ -124,6 +124,9 @@ struct SettingsView: View {
                 } else if controller.isEngaged {
                     Button("Pause") { controller.pause() }
                 }
+                Link("♥ Sponsor", destination: URL(string: "https://github.com/sponsors/maheshj01")!)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 Spacer()
                 Button("Quit iFold") { NSApp.terminate(nil) }
                     .keyboardShortcut("q")

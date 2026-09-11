@@ -3,6 +3,7 @@
 [![Release](https://img.shields.io/github/v/release/maheshj01/ifold?display_name=tag)](https://github.com/maheshj01/ifold/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-macOS%2014%2B%20%C2%B7%20Apple%20silicon-111)](#requirements)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/sponsor-%E2%99%A5-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/maheshj01)
 [![Website](https://img.shields.io/badge/website-ifold--mac.vercel.app-0f7f8c)](https://ifold-mac.vercel.app/)
 
 iPhone Duo's fold, for the MacBook lid you already have.
@@ -42,6 +43,14 @@ soft click when you open the lid past the clear angle.
 
 Verify the download if you like: `shasum -a 256 iFold.dmg` should match `SHA256SUMS`
 on the release page.
+
+## Support iFold
+
+iFold is free and open source. If it makes closing your Mac a little nicer,
+[sponsor the project on GitHub](https://github.com/sponsors/maheshj01). Sponsorship
+pays for the Apple Developer membership that lets releases be notarized — which is
+exactly what makes the *Open Anyway* step above disappear — and for the time to keep
+shipping.
 
 ## Build from source
 
