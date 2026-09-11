@@ -6,7 +6,7 @@ import CoreVideo
 /// geometry for the same strip renderer; the spring, motion blur and frost
 /// apply to all of them, so they share one feel.
 enum FoldStyle: String, CaseIterable, Identifiable {
-    case fold, curl, genie, cube, scale, fade
+    case fold, curl, genie, notch, cube, scale, fade
     var id: String { rawValue }
     var title: String { rawValue.capitalized }
     var blurb: String {
@@ -14,6 +14,7 @@ enum FoldStyle: String, CaseIterable, Identifiable {
         case .fold:  return "Leans away from the hinge, like a sheet folding shut."
         case .curl:  return "The top edge rolls over and away, like a page curling toward the hinge."
         case .genie: return "Drawn down into the hinge, the way windows minimize into the Dock."
+        case .notch: return "Pulled up into the notch — and back out when you open the lid."
         case .cube:  return "One face of a cube, turning with the lid."
         case .scale: return "Shrinks toward the hinge and settles into the dark."
         case .fade:  return "Dims and drains of colour, like a display drifting to sleep."
@@ -68,12 +69,10 @@ final class FoldView: NSView {
     private var strips: [Strip] = []
     /// Cube: the face that swings into view under the desktop as the cube turns.
     private let cubeFace = CAGradientLayer()
-    /// Genie: strips can only scale as rectangles, so their narrowing edges
-    /// step; this screen-space silhouette clips the steps to a smooth funnel.
-    private let funnelMask = CAShapeLayer()
     private let motionBlur = CIFilter(name: "CIMotionBlur")!
     private let frostBlur = CIFilter(name: "CIGaussianBlur")!
     private let tone = CIFilter(name: "CIColorControls")! // Fade: desaturation
+    private let pinch = CIFilter(name: "CIPinchDistortion")! // Notch: per-pixel pull toward the notch
     private var installedFilters = 0
     private var currentBuffer: CVPixelBuffer?
     private(set) var pose = FoldPose.flat
@@ -86,12 +85,15 @@ final class FoldView: NSView {
     private var activeCount = 18
     private static func stripCount(for style: FoldStyle) -> Int {
         switch style {
-        case .curl, .genie: return 64
+        case .curl, .genie, .notch: return 64
         case .fold: return 18
         case .cube, .scale, .fade: return 8
         }
     }
     private var currentSurface: IOSurfaceRef?
+    /// Width of the display's notch in points (Notch style pulls the desktop
+    /// into exactly that opening); a plausible default on notch-less Macs.
+    private var notchWidth: CGFloat = 180
 
     private struct Strip {
         let layer = CALayer()
@@ -122,6 +124,8 @@ final class FoldView: NSView {
         frostBlur.setValue(0, forKey: kCIInputRadiusKey)
         tone.name = "tone"
         tone.setValue(1, forKey: kCIInputSaturationKey)
+        pinch.name = "pinch"
+        pinch.setValue(0, forKey: kCIInputScaleKey)
 
         cubeFace.anchorPoint = CGPoint(x: 0.5, y: 0)
         cubeFace.startPoint = CGPoint(x: 0.5, y: 0)
@@ -129,7 +133,6 @@ final class FoldView: NSView {
         cubeFace.colors = [NSColor(white: 0.16, alpha: 1).cgColor, NSColor(white: 0.03, alpha: 1).cgColor]
         cubeFace.isHidden = true
         container.addSublayer(cubeFace) // behind the strips
-        funnelMask.fillColor = NSColor.black.cgColor
 
         for _ in 0..<Self.stripCount {
             let s = Strip()
@@ -161,11 +164,15 @@ final class FoldView: NSView {
             let scale = window?.backingScaleFactor ?? 2
             container.contentsScale = scale
             layoutStrips()
+            if let screen = window?.screen,
+               let l = screen.auxiliaryTopLeftArea, let r = screen.auxiliaryTopRightArea, r.minX > l.maxX {
+                notchWidth = r.minX - l.maxX
+            } else {
+                notchWidth = bounds.width * 0.12
+            }
             cubeFace.bounds = CGRect(x: 0, y: 0, width: bounds.width, height: bounds.height)
             cubeFace.position = CGPoint(x: bounds.midX, y: 0)
             cubeFace.contentsScale = scale
-            funnelMask.frame = container.bounds
-            funnelMask.contentsScale = scale
             updatePerspective()
             applyPose(pose)
         }
@@ -195,13 +202,9 @@ final class FoldView: NSView {
         }
     }
 
-    /// Where a point in the container's 3D space lands after the perspective
-    /// in `sublayerTransform` (x relative to the horizontal centre).
-    private func project(x: Double, y: Double, z: Double) -> CGPoint {
-        let d = Double(max(perspectiveDistance, 200))
-        let ax = Double(bounds.midX), ay = Double(bounds.height) * Double(container.anchorPoint.y)
-        let k = 1 / (1 - z / d)
-        return CGPoint(x: ax + x * k, y: ay + (y - ay) * k)
+    private func smoothstep(_ a: Double, _ b: Double, _ x: Double) -> Double {
+        let t = min(1, max(0, (x - a) / (b - a)))
+        return t * t * (3 - 2 * t)
     }
 
     private func updatePerspective() {
@@ -284,37 +287,35 @@ final class FoldView: NSView {
                 z -= h * sin(phi)
             }
 
-        case .genie:
-            // The hinge end narrows into a neck first; the whole sheet is then
-            // pulled down through it. A little lean gives the funnel depth.
-            let phi = tiltRad * 0.3
+        case .genie, .notch:
+            // Pulled through an opening: the hinge (Genie) or the notch (Notch).
+            // Strips compress toward the opening and the whole sheet narrows
+            // uniformly — both continuous, so nothing steps — while a per-pixel
+            // pinch centred on the opening (installed below) does the funnel.
+            let toTop = p.style == .notch
+            let through = smoothstep(0.35, 1, prog)
+            let height = 1 - 0.985 * smoothstep(0.2, 1, prog)   // fraction of the screen still occupied
+            let sx = 1 - 0.85 * through
+            let phi = tiltRad * (toTop ? 0.12 : 0.3)
             phiAt = { _ in phi }
-            dimAt = { _ in 0.3 * prog }
-            var y = 0.0, z = 0.0
-            let W = Double(bounds.width)
-            var left: [CGPoint] = [project(x: -W / 2 * (1 - 0.97 * prog), y: 0, z: 0)]
-            var right: [CGPoint] = [project(x: W / 2 * (1 - 0.97 * prog), y: 0, z: 0)]
-            for i in 0..<n {
+            dimAt = { u in 0.4 * prog * (toTop ? u : 1 - u) }
+            let weights = (0..<n).map { i -> Double in
                 let u = (Double(i) + 0.5) / Double(n)
-                let sx = 1 - 0.97 * prog * pow(1 - u, 1.35)
-                let sy = (1 - 0.65 * prog) * (1 - 0.45 * prog * (1 - u))
+                return 1 - 0.6 * through * (toTop ? u : 1 - u)   // nearest the opening compresses most
+            }
+            let wsum = weights.reduce(0, +)
+            let sys = weights.map { height * Double(n) * $0 / wsum }
+            var y = toTop ? H - sys.reduce(0) { $0 + h * $1 * cos(phi) } : 0
+            var z = 0.0
+            for i in 0..<n {
+                let sy = sys[i]
                 var t = CATransform3DMakeTranslation(0, CGFloat(y), CGFloat(z))
                 t = CATransform3DRotate(t, -CGFloat(phi), 1, 0, 0)
                 t = CATransform3DScale(t, CGFloat(sx), CGFloat(sy), 1)
                 transforms.append(t)
                 y += h * sy * cos(phi)
                 z -= h * sy * sin(phi)
-                // Silhouette through each strip's *top* corners: the wider strip
-                // above overhangs here, and the mask trims that overhang away.
-                left.append(project(x: -W / 2 * sx, y: y, z: z))
-                right.append(project(x: W / 2 * sx, y: y, z: z))
             }
-            let path = CGMutablePath()
-            path.move(to: left[0])
-            for pt in left.dropFirst() { path.addLine(to: pt) }
-            for pt in right.reversed() { path.addLine(to: pt) }
-            path.closeSubpath()
-            funnelMask.path = path
 
         case .cube:
             // Rigid rotation about the cube's centre (half a screen behind the
@@ -359,8 +360,6 @@ final class FoldView: NSView {
         }
 
         cubeFace.isHidden = !(p.style == .cube && prog > 0.001)
-        let wantMask = p.style == .genie && prog > 0.001
-        if wantMask != (container.mask != nil) { container.mask = wantMask ? funnelMask : nil }
 
         for (i, s) in strips.prefix(n).enumerated() {
             let u0 = Double(i) / Double(n), u1 = Double(i + 1) / Double(n)
@@ -373,9 +372,11 @@ final class FoldView: NSView {
         // Filters live on the container; install only what this frame needs.
         let wantBlur = p.motionBlur > 0.25 || p.frost > 0.25
         let wantTone = p.style == .fade && prog > 0.01
-        let key = (wantBlur ? 1 : 0) | (wantTone ? 2 : 0)
+        let wantPinch = (p.style == .genie || p.style == .notch) && prog > 0.001
+        let key = (wantBlur ? 1 : 0) | (wantTone ? 2 : 0) | (wantPinch ? 4 : 0)
         if key != installedFilters {
             var f: [CIFilter] = []
+            if wantPinch { f.append(pinch) } // warp first, then blur the warped picture
             if wantBlur { f += [motionBlur, frostBlur] }
             if wantTone { f.append(tone) }
             container.filters = f.isEmpty ? nil : f
@@ -387,6 +388,15 @@ final class FoldView: NSView {
         }
         if wantTone {
             container.setValue(1 - 0.9 * prog, forKeyPath: "filters.tone.inputSaturation")
+        }
+        if wantPinch {
+            // Centre on the opening; the radius reaches the far corners so the
+            // whole sheet is inside the pull.
+            let W = Double(bounds.width)
+            let cy = p.style == .notch ? H : 0
+            container.setValue(CIVector(x: CGFloat(W / 2), y: CGFloat(cy)), forKeyPath: "filters.pinch.inputCenter")
+            container.setValue(hypot(W / 2, H) * 1.05, forKeyPath: "filters.pinch.inputRadius")
+            container.setValue(min(1, 1.1 * pow(prog, 0.8)), forKeyPath: "filters.pinch.inputScale")
         }
     }
 
@@ -418,7 +428,7 @@ final class FoldView: NSView {
     var stateDescription: String {
         let bw = currentBuffer.map { CVPixelBufferGetWidth($0) } ?? 0
         let bh = currentBuffer.map { CVPixelBufferGetHeight($0) } ?? 0
-        return "view=\(bounds.size) style=\(pose.style.rawValue) tilt=\(pose.tilt) bend=\(pose.bend) mblur=\(pose.motionBlur) frost=\(pose.frost) shade=\(pose.shade) filters=\(installedFilters) buffer=\(bw)x\(bh)"
+        return "view=\(bounds.size) style=\(pose.style.rawValue) tilt=\(pose.tilt) bend=\(pose.bend) mblur=\(pose.motionBlur) frost=\(pose.frost) shade=\(pose.shade) filters=\(installedFilters) strips=\(activeCount) buffer=\(bw)x\(bh)"
     }
 
     // MARK: Input — a click pauses the effect until the lid opens again.

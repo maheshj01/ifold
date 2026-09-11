@@ -90,13 +90,14 @@ angle and lets you tune everything about the fold:
 
 ### Styles
 
-Six motions, all riding the same spring, motion blur and frost:
+Seven motions, all riding the same spring, motion blur and frost:
 
 | Style | As the lid comes down… |
 |---|---|
 | **Fold** | The desktop leans away from the hinge, curling toward the top. The default. |
 | **Curl** | The top edge rolls over and away, like a page curling toward the hinge. |
 | **Genie** | The desktop is drawn down into the hinge, the way windows minimize into the Dock. |
+| **Notch** | The desktop is pulled up into the notch — the real one, measured from the display — and comes back out when you open the lid. |
 | **Cube** | The desktop is one face of a cube turning with the lid; the underside swings into view. |
 | **Scale** | The desktop shrinks toward the hinge and settles into the dark. |
 | **Fade** | The desktop dims and drains of colour, like a display drifting to sleep. |
