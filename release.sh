@@ -182,6 +182,10 @@ iFold Mac is free and open source. If you enjoy it, [sponsoring](https://github.
 `SHA-256 ifold-mac.dmg`: `@SHA@`
 EON
 sed -i '' "s/@SHA@/$SHA/" "$NOTES"
+# RELEASE_NOTES.md (optional, committed) goes on top as "What's new".
+if [[ -f RELEASE_NOTES.md ]]; then
+  { cat RELEASE_NOTES.md; echo; cat "$NOTES"; } > "$NOTES.tmp" && mv "$NOTES.tmp" "$NOTES"
+fi
 
 run() { if (( DRY )); then echo "  [dry-run] $*"; else "$@"; fi; }
 echo
