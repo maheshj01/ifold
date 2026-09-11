@@ -3,7 +3,7 @@ import Combine
 import CoreGraphics
 import os
 
-let log = Logger(subsystem: "com.mahesh.ifold", category: "fold")
+let log = Logger(subsystem: "com.wml.ifold", category: "fold")
 
 /// Orchestrates sensor → capture → overlay.
 ///
@@ -59,6 +59,7 @@ final class FoldController: ObservableObject {
     private var suspendedUntil = Date.distantPast
     #if IFOLD_DEBUG
     private var debugSnapshot: DebugSnapshot?
+    private var demoDriver: DemoDriver?
     #endif
 
     private let maxTilt: Double = 80
@@ -77,6 +78,7 @@ final class FoldController: ObservableObject {
         #if IFOLD_DEBUG
         debugSnapshot = DebugSnapshot(window: { [weak self] in self?.window },
                                       displayID: { Self.builtInScreen().flatMap(Self.displayID) })
+        demoDriver = DemoDriver(settings: settings, window: { [weak self] in self?.window })
         #endif
         observeSystemEvents()
 

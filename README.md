@@ -86,18 +86,18 @@ resting at a normal working angle costs nothing beyond the idle poll.
 
 ## Debugging
 
-Logs go to the unified log under subsystem `com.mahesh.ifold`
+Logs go to the unified log under subsystem `com.wml.ifold`
 (note: `log` is a zsh builtin, use the full path):
 
 ```bash
-/usr/bin/log stream --predicate 'subsystem == "com.mahesh.ifold"' --info
+/usr/bin/log stream --predicate 'subsystem == "com.wml.ifold"' --info
 ```
 
 To see exactly what the overlay renders, ask the running app for a screenshot
 of the built-in display *including* its own window:
 
 ```bash
-defaults write com.mahesh.ifold snapshotPath ~/Desktop/ifold.png && notifyutil -p com.mahesh.ifold.snapshot
+defaults write com.wml.ifold snapshotPath ~/Desktop/ifold.png && notifyutil -p com.wml.ifold.snapshot
 ```
 
 ## How it works
