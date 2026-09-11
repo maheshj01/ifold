@@ -83,8 +83,9 @@ if (( PUBLISH )); then
       echo "tag $TAG already exists on GitHub and points at another commit."
       echo "bump CFBundleShortVersionString in Resources/Info.plist for a new release."
       (( DRY )) && echo "  [dry-run] continuing anyway to show the steps" || exit 1
+    else
+      echo "tag $TAG already exists at this commit — release assets will be replaced"
     fi
-    echo "tag $TAG already exists at this commit — release assets will be replaced"
   fi
 fi
 
