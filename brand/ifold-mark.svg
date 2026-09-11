@@ -1,17 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="220 312 584 400" width="584" height="400">
-  <defs>
-    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2A2C36"/><stop offset="1" stop-color="#0E0F14"/></linearGradient>
-    <linearGradient id="wall" gradientUnits="userSpaceOnUse" x1="240" y1="340" x2="784" y2="700"><stop offset="0" stop-color="#FF7A59"/><stop offset=".5" stop-color="#A360FF"/><stop offset="1" stop-color="#4AA4FF"/></linearGradient>
-    <linearGradient id="back" gradientUnits="userSpaceOnUse" x1="784" y1="700" x2="240" y2="340"><stop offset="0" stop-color="#4AA4FF"/><stop offset=".5" stop-color="#A360FF"/><stop offset="1" stop-color="#FF7A59"/></linearGradient>
-    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="14"/></filter>
-  </defs>
-  <!-- the screen, minus the corner that folds -->
-  <path d="M284 332H740a44 44 0 0 1 44 44V442L534 692H284a44 44 0 0 1-44-44V376a44 44 0 0 1 44-44z" fill="url(#wall)"/>
-  <!-- shadow the folded corner casts -->
-  <path d="M784 442 534 692 784 692z" fill="#000" fill-opacity=".40" filter="url(#soft)"/>
-  <!-- the folded corner: the back of the screen -->
-  <path d="M784 442V648a44 44 0 0 1-44 44H534z" fill="url(#back)"/>
-  <path d="M784 442V648a44 44 0 0 1-44 44H534z" fill="#000" fill-opacity=".32"/>
-  <!-- crease -->
-  <path d="M784 442 534 692" stroke="#fff" stroke-opacity=".85" stroke-width="7" stroke-linecap="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="584" height="400" viewBox="220 312 584 400"><defs><linearGradient id="tile" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2A2C36"/><stop offset="1" stop-color="#0E0F14"/></linearGradient><linearGradient id="wall" x1="240" x2="784" y1="340" y2="700" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF7A59"/><stop offset=".5" stop-color="#A360FF"/><stop offset="1" stop-color="#4AA4FF"/></linearGradient><linearGradient id="back" x1="784" x2="240" y1="700" y2="340" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#4AA4FF"/><stop offset=".5" stop-color="#A360FF"/><stop offset="1" stop-color="#FF7A59"/></linearGradient><filter id="soft" width="140%" height="140%" x="-20%" y="-20%"><feGaussianBlur stdDeviation="14"/></filter></defs><path fill="url(#wall)" d="M284 332H740a44 44 0 0 1 44 44V442L534 692H284a44 44 0 0 1-44-44V376a44 44 0 0 1 44-44z"/><path fill="#000" fill-opacity=".4" d="M784 442 534 692 784 692z" filter="url(#soft)"/><path fill="url(#back)" d="M784 442V648a44 44 0 0 1-44 44H534z"/><path fill="#000" fill-opacity=".32" d="M784 442V648a44 44 0 0 1-44 44H534z"/><path stroke="#fff" stroke-linecap="round" stroke-opacity=".85" stroke-width="7" d="M784 442 534 692"/></svg>
