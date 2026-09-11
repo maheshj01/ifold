@@ -78,7 +78,8 @@ if (( PUBLISH )); then
   if existing=$(git ls-remote --tags origin "refs/tags/$TAG" | cut -f1) && [[ -n "$existing" ]]; then
     if [[ "$existing" != "$(git rev-parse HEAD)" && "$existing" != "$(git rev-parse "$TAG^{commit}" 2>/dev/null)" ]]; then
       echo "tag $TAG already exists on GitHub and points at another commit."
-      echo "bump CFBundleShortVersionString in Resources/Info.plist for a new release."; exit 1
+      echo "bump CFBundleShortVersionString in Resources/Info.plist for a new release."
+      (( DRY )) && echo "  [dry-run] continuing anyway to show the steps" || exit 1
     fi
     echo "tag $TAG already exists at this commit — release assets will be replaced"
   fi
