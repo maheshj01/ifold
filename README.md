@@ -70,7 +70,9 @@ On first launch grant Screen Recording as described above, then relaunch.
 ## Using it
 
 iFold Mac lives in the menu bar (laptop icon). The popover shows the live hinge
-angle and lets you tune:
+angle and lets you tune everything about the fold:
+
+<img src="site/dist/assets/settings-popover.png" width="320" alt="The iFold menu bar popover: Follow lid / Manual, Clears at, Silk / Shade / Frost presets, Perspective, Bend, Motion blur, Frost and Shade sliders, click sound and launch-at-login toggles">
 
 | Control      | What it does                                                         |
 |--------------|----------------------------------------------------------------------|

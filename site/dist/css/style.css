@@ -536,6 +536,20 @@ h1 span {
 }
 
 /* --------------------------------------------------------------------------
+   Settings (the popover, and what each control does)
+   -------------------------------------------------------------------------- */
+.settings { max-width: 1100px; margin: auto; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 72px; align-items: center; }
+.settings-copy > p:not(.eyebrow) { font-size: 18px; line-height: 1.5; color: var(--muted); margin: 28px 0 34px; max-width: 46ch; }
+.settings-list { margin: 0; display: grid; gap: 0; }
+.settings-list div { display: grid; grid-template-columns: 200px 1fr; gap: 18px; padding: 14px 0; border-top: 1px solid var(--line); }
+.settings-list div:last-child { border-bottom: 1px solid var(--line); }
+.settings-list dt { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; }
+.settings-list dd { margin: 0; font-size: 15px; line-height: 1.5; color: var(--muted); }
+.settings-shot { margin: 0; justify-self: center; text-align: center; }
+.settings-shot img { display: block; width: 320px; max-width: 100%; height: auto; border-radius: 14px; box-shadow: 0 40px 80px -30px #0006, 0 0 0 1px #0000000d; }
+.settings-shot figcaption { font-size: 13px; color: #86868b; margin-top: 18px; }
+
+/* --------------------------------------------------------------------------
    Real world — photo
    -------------------------------------------------------------------------- */
 .real-world {
@@ -810,6 +824,8 @@ dialog p a { color: var(--accent); }
 }
 
 @media (max-width: 900px) {
+  .settings { grid-template-columns: 1fr; gap: 44px; }
+  .settings-shot { justify-self: start; }
   .nav {
     padding: 0 25px;
   }
@@ -873,6 +889,7 @@ dialog p a { color: var(--accent); }
 }
 
 @media (max-width: 600px) {
+  .settings-list div { grid-template-columns: 1fr; gap: 4px; }
   .nav {
     height: 66px;
     padding: 0 22px;
