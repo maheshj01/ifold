@@ -144,19 +144,20 @@ echo "built $DMG (v$VERSION, $(du -h "$DMG" | cut -f1))"
 # --- publish -----------------------------------------------------------------
 SHA=$(cut -d' ' -f1 "$DIST/SHA256SUMS")
 NOTES=$(mktemp)
-cat > "$NOTES" <<EON
+cat > "$NOTES" <<'EON'
 iPhone Duo's fold, for the MacBook lid you already have. iFold reads the hinge angle from the built-in lid sensor and bends your live desktop as the lid comes down.
 
 ## Install
 
 1. Download **iFold.dmg** below, open it, drag iFold to Applications.
-2. First launch: macOS says it can't verify the app (signed, not yet notarized). Click **Done**, then **System Settings → Privacy & Security → Open Anyway**. Or: \\`xattr -d com.apple.quarantine /Applications/iFold.app\\`
+2. First launch: macOS says it can't verify the app (signed, not yet notarized). Click **Done**, then **System Settings → Privacy & Security → Open Anyway**. Or: `xattr -d com.apple.quarantine /Applications/iFold.app`
 3. Grant **Screen Recording** when asked, then click **Relaunch** in the iFold window.
 
 Requires an Apple silicon MacBook with a lid-angle sensor (M2 Air and later, 14"/16" Pro) on macOS 14+. Illustrated steps: https://ifold-mac.vercel.app
 
-\\`SHA-256 iFold.dmg\\`: \\`$SHA\\`
+`SHA-256 iFold.dmg`: `@SHA@`
 EON
+sed -i '' "s/@SHA@/$SHA/" "$NOTES"
 
 run() { if (( DRY )); then echo "  [dry-run] $*"; else "$@"; fi; }
 echo
