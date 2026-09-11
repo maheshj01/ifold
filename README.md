@@ -175,30 +175,44 @@ notifyutil -p com.wml.ifold-mac.demo
 
 ## Releasing (maintainers)
 
-1. Bump `CFBundleShortVersionString` in `Resources/Info.plist` (and the version/size line in
-   `site/dist/index.html`'s download dialog), commit, push.
-2. Publish:
+Publishing a DMG is one command, but three files describe the release; keep them in step:
 
-   ```bash
-   ./release.sh --publish
-   ```
+1. **Version** — bump `CFBundleShortVersionString` (and `CFBundleVersion`) in `Resources/Info.plist`.
+   Tags are immutable, so a version that's already been tagged can't be re-published.
+2. **Notes** — write the *What's new* for this version in `RELEASE_NOTES.md`; `release.sh` puts
+   it at the top of the GitHub release, above the standard install steps and checksum.
+3. **Site** — update the version/size line in the download dialog in `site/dist/index.html`
+   (the DMG size is printed by `release.sh`; ~1.2 MB today).
 
-   Builds, signs, lays out `dist/ifold-mac.dmg`, tags `v<version>`, pushes the tag, creates the GitHub
-   release (or replaces the assets if the release for this commit already exists), uploads
-   `ifold-mac.dmg` + `SHA256SUMS`, then downloads the DMG back through the public
-   `releases/latest/download/ifold-mac.dmg` link and fails if the checksum doesn't match.
-   It refuses to run on a dirty tree, an unpushed HEAD, or a version that's already tagged at
-   another commit. Add `--dry-run` to see the steps without tagging or uploading.
+Commit and push those, then:
 
-3. Any time, confirm what GitHub is actually serving:
+```bash
+./release.sh --publish
+```
 
-   ```bash
-   ./release.sh --check
-   ```
+Builds, signs, lays out `dist/ifold-mac.dmg`, tags `v<version>`, pushes the tag, creates the GitHub
+release (or replaces the assets if the release for this commit already exists), uploads
+`ifold-mac.dmg` + `SHA256SUMS`, then downloads the DMG back through the public
+`releases/latest/download/ifold-mac.dmg` link and fails unless the checksum matches.
+It refuses to run on a dirty tree, an unpushed HEAD, or a version already tagged at another
+commit. Add `--dry-run` to see the steps without tagging or uploading.
 
-If a *Developer ID Application* identity and a `notarytool` keychain profile named `ifold-mac` exist,
-the same command notarizes and staples both the app and the DMG. The asset is always named
-`ifold-mac.dmg` so the download links in this README and on the website keep working.
+Any time, confirm what GitHub is actually serving (and that it matches its own checksum):
+
+```bash
+./release.sh --check
+```
+
+The asset is always named `ifold-mac.dmg`, so the download links in this README and on the
+website keep working across releases. If a *Developer ID Application* identity and a
+`notarytool` keychain profile named `ifold-mac` exist, the same command notarizes and staples
+both the app and the DMG, and the Gatekeeper *Open Anyway* step disappears for users.
+
+**What never ships.** Normal builds contain no screenshot, demo or recording code: the developer
+hooks live behind `--debug-tools` (see *Privacy & security posture*), and `build.sh` refuses to
+assemble a normal build whose binary contains them. `site/record-demo.sh`, which records the
+website's style clips, uses a `--debug-tools` build and is tooling for the site, not a feature of
+the app.
 
 ## How it works
 
