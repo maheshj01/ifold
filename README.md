@@ -1,6 +1,6 @@
 # iFold
 
-[![Release](https://img.shields.io/github/v/release/maheshj01/ifold?display_name=tag)](https://github.com/maheshj01/ifold/releases/latest)
+[![Release](https://img.shields.io/github/v/release/maheshj01/ifold-mac?display_name=tag)](https://github.com/maheshj01/ifold-mac/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-macOS%2014%2B%20%C2%B7%20Apple%20silicon-111)](#requirements)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%99%A5-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/maheshj01)
@@ -22,8 +22,8 @@ soft click when you open the lid past the clear angle.
 
 ## Install
 
-**[⬇ Download iFold.dmg](https://github.com/maheshj01/ifold/releases/latest/download/iFold.dmg)**
-(latest release · [all releases](https://github.com/maheshj01/ifold/releases) · [website](https://ifold-mac.vercel.app/))
+**[⬇ Download iFold.dmg](https://github.com/maheshj01/ifold-mac/releases/latest/download/iFold.dmg)**
+(latest release · [all releases](https://github.com/maheshj01/ifold-mac/releases) · [website](https://ifold-mac.vercel.app/))
 
 1. Open the DMG and drag **iFold** into **Applications**.
 2. Launch it. macOS will say it *"could not verify that iFold is free of malware"* —
@@ -57,8 +57,8 @@ shipping.
 Needs Xcode 15+ (or the Command Line Tools with a Swift 5.9 toolchain).
 
 ```bash
-git clone https://github.com/maheshj01/ifold.git
-cd ifold
+git clone https://github.com/maheshj01/ifold-mac.git
+cd ifold-mac
 ./build.sh --run        # build, assemble build/iFold.app, launch
 ./build.sh --install    # same, then copy to /Applications
 ```

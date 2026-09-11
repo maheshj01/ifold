@@ -23,7 +23,7 @@ cd "$(dirname "$0")"
 
 VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" Resources/Info.plist)
 TAG="v$VERSION"
-REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || echo "maheshj01/ifold")
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null || echo "maheshj01/ifold-mac")
 LATEST_URL="https://github.com/$REPO/releases/latest/download/iFold.dmg"
 APP=build/iFold.app
 DIST=dist
