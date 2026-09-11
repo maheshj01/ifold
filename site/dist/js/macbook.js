@@ -311,19 +311,23 @@ function lidOutline(inset = 0) {
 }
 
 /**
- * The lid's top edge (its 3.6 mm thickness). Only the top face can ever be
- * seen from a centred camera — the side faces point away — and only when the
- * lid leans back past vertical.
+ * The lid's top edge (its 3.6 mm thickness), extruded from the *rounded*
+ * outline so it follows the corners instead of poking past them. Only the top
+ * face can ever be seen from a centred camera — the side faces point away —
+ * and only when the lid leans back past vertical.
  */
 function drawLidEdge(ctx, { lid }, angle) {
   if (angle <= 90) return;
-  const hw = LID.width / 2;
-  polygon(ctx, [lid(-hw, LID.height, 0), lid(hw, LID.height, 0), lid(hw, LID.height, -LID.thickness), lid(-hw, LID.height, -LID.thickness)], '#a3a7ad');
+  const top = lidOutline(0)
+    .filter(([, u]) => u >= LID.height - LID.radiusTop - 0.01)
+    .sort((a, b) => a[0] - b[0]);
+  const face = [...top.map(([x, u]) => lid(x, u, 0)), ...top.map(([x, u]) => lid(x, u, -LID.thickness)).reverse()];
+  polygon(ctx, face, '#9a9ea4');
 }
 
 function drawBezel(ctx, { lid }) {
   ctx.lineJoin = 'round';
-  polygon(ctx, lidOutline(0).map(([x, u]) => lid(x, u, 0)), '#9ea3a9'); // thin aluminium rim
+  polygon(ctx, lidOutline(0).map(([x, u]) => lid(x, u, 0)), '#8d9298'); // thin aluminium rim
   polygon(ctx, lidOutline(LID.rim).map(([x, u]) => lid(x, u, 0.2)), '#0b0c0e'); // black bezel
 }
 
