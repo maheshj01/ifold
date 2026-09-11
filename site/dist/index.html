@@ -47,6 +47,7 @@
       </a>
       <nav aria-label="Main navigation">
         <a href="#experience">Experience</a>
+        <a href="#styles">Styles</a>
         <a href="#details">The little details</a>
         <a href="#settings">Settings</a>
         <button class="button small" id="nav-download" type="button">Download <span aria-hidden="true">↓</span></button>
@@ -147,6 +148,40 @@
             its thing.
           </p>
         </article>
+      </section>
+
+      <section class="styles section-pad" id="styles" aria-labelledby="styles-title">
+        <div class="styles-heading">
+          <div>
+            <p class="eyebrow">SEVEN WAYS TO SAY GOODNIGHT</p>
+            <h2 id="styles-title">Pick your fold.</h2>
+          </div>
+          <p>Every style rides the same spring, blur and light.<br />Choose the one that feels like you.</p>
+        </div>
+
+        <div class="styles-display">
+            <video class="style-clip is-active" data-style="fold" muted playsinline loop preload="metadata" poster="assets/styles/fold.jpg" aria-label="Fold: Leans away from the hinge, like a sheet folding shut."><source src="assets/styles/fold.mp4" type="video/mp4" /></video>
+            <video class="style-clip" data-style="curl" muted playsinline loop preload="none" poster="assets/styles/curl.jpg" data-src="assets/styles/curl.mp4" aria-label="Curl: The top edge rolls over and away, like a page curling toward the hinge."></video>
+            <video class="style-clip" data-style="genie" muted playsinline loop preload="none" poster="assets/styles/genie.jpg" data-src="assets/styles/genie.mp4" aria-label="Genie: Drawn down into the hinge, the way windows minimize into the Dock."></video>
+            <video class="style-clip" data-style="notch" muted playsinline loop preload="none" poster="assets/styles/notch.jpg" data-src="assets/styles/notch.mp4" aria-label="Notch: Pulled up into the notch — and back out when you open the lid."></video>
+            <video class="style-clip" data-style="cube" muted playsinline loop preload="none" poster="assets/styles/cube.jpg" data-src="assets/styles/cube.mp4" aria-label="Cube: One face of a cube, turning with the lid."></video>
+            <video class="style-clip" data-style="scale" muted playsinline loop preload="none" poster="assets/styles/scale.jpg" data-src="assets/styles/scale.mp4" aria-label="Scale: Shrinks toward the hinge and settles into the dark."></video>
+            <video class="style-clip" data-style="fade" muted playsinline loop preload="none" poster="assets/styles/fade.jpg" data-src="assets/styles/fade.mp4" aria-label="Fade: Dims and drains of colour, like a display drifting to sleep."></video>
+        </div>
+
+        <div class="styles-controls">
+          <div class="presets styles-picker" role="tablist" aria-label="Style">
+              <button type="button" role="tab" aria-selected="true" data-style="fold" data-caption="Leans away from the hinge, like a sheet folding shut.">Fold</button>
+              <button type="button" role="tab" aria-selected="false" data-style="curl" data-caption="The top edge rolls over and away, like a page curling toward the hinge.">Curl</button>
+              <button type="button" role="tab" aria-selected="false" data-style="genie" data-caption="Drawn down into the hinge, the way windows minimize into the Dock.">Genie</button>
+              <button type="button" role="tab" aria-selected="false" data-style="notch" data-caption="Pulled up into the notch — and back out when you open the lid.">Notch</button>
+              <button type="button" role="tab" aria-selected="false" data-style="cube" data-caption="One face of a cube, turning with the lid.">Cube</button>
+              <button type="button" role="tab" aria-selected="false" data-style="scale" data-caption="Shrinks toward the hinge and settles into the dark.">Scale</button>
+              <button type="button" role="tab" aria-selected="false" data-style="fade" data-caption="Dims and drains of colour, like a display drifting to sleep.">Fade</button>
+          </div>
+          <p class="styles-caption" id="styles-caption" aria-live="polite">Leans away from the hinge, like a sheet folding shut.</p>
+        </div>
+        <p class="demo-note">Screen recordings of the app. A real desktop; the lid path is scripted so every take matches.</p>
       </section>
 
       <section class="settings section-pad" id="settings" aria-labelledby="settings-title">

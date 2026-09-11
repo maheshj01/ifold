@@ -35,7 +35,8 @@ site/dist/
 │   ├── macbook.js        millimetre-accurate MacBook Pro 14" renderer, folding desktop, motion blur
 │   ├── desktop-texture.js  loads the desktop screenshot and builds the frosted copy
 │   ├── fold-view.js      spring + motion-blur state per canvas (ported from the app), replay, rAF loop
-│   └── dialogs.js        native <dialog> behaviour and the copy button
+│   ├── dialogs.js        native <dialog> behaviour and the copy button
+│   └── styles.js         Styles section: swaps one recorded take per style, lazy-loads, autoplays in view
 └── assets/
     ├── icon.svg, favicon-32.png, apple-touch-icon.png
     ├── desktop.{webp,jpg}   the real desktop shown on the screen

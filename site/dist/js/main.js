@@ -9,6 +9,7 @@
 import { loadDesktopTextures } from './desktop-texture.js';
 import { FoldView, Animator, OPEN_ANGLE, reducedMotion } from './fold-view.js';
 import { setupDialogs } from './dialogs.js';
+import { setupStyles } from './styles.js';
 
 const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 const smoothstep = (t) => t * t * (3 - 2 * t);
@@ -146,5 +147,6 @@ if (reducedMotion.matches) {
 // --- Go --------------------------------------------------------------------
 
 setupDialogs();
+setupStyles();
 updateScroll();
 animator.wake();
