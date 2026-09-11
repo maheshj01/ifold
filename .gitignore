@@ -1,0 +1,15 @@
+# SwiftPM
+.build/
+.swiftpm/
+Package.resolved
+
+# Assembled app bundle (build.sh output)
+build/
+
+# Editors / tooling
+.vscode/
+.claude/settings.local.json
+.DS_Store
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
