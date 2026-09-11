@@ -1,5 +1,9 @@
 # iFold
 
+[![Release](https://img.shields.io/github/v/release/maheshj01/ifold?display_name=tag)](https://github.com/maheshj01/ifold/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-macOS%2014%2B%20%C2%B7%20Apple%20silicon-111)](#requirements)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 iPhone Duo's fold, for the MacBook lid you already have.
 
 iFold reads the hinge angle from your MacBook's built-in lid sensor and bends
@@ -14,16 +18,44 @@ soft click when you open the lid past the clear angle.
 - **Screen Recording** permission — the desktop is captured with ScreenCaptureKit.
   Frames never leave the GPU; nothing is saved or uploaded.
 
-## Build & run
+## Install
+
+**[⬇ Download iFold.dmg](https://github.com/maheshj01/ifold/releases/latest/download/iFold.dmg)**
+(latest release · [all releases](https://github.com/maheshj01/ifold/releases))
+
+1. Open the DMG and drag **iFold** into **Applications**.
+2. Launch it. macOS will say it *"could not verify that iFold is free of malware"* —
+   the app is signed but **not yet notarized** (that needs a paid Apple Developer ID;
+   the build is [reproducible from source](#build-from-source) if you'd rather not trust
+   a binary). Click **Done**, open **System Settings → Privacy & Security**, scroll
+   to the bottom and click **Open Anyway**, then **Open**.
+
+   Terminal alternative that skips the dialog:
+   ```bash
+   xattr -d com.apple.quarantine /Applications/iFold.app
+   ```
+3. iFold asks for **Screen Recording**. Enable it under
+   **System Settings → Privacy & Security → Screen & System Audio Recording**,
+   then click **Relaunch** in the iFold window.
+4. Tilt the lid down a little. That's it — iFold lives in the menu bar (laptop icon).
+
+Verify the download if you like: `shasum -a 256 iFold.dmg` should match `SHA256SUMS`
+on the release page.
+
+## Build from source
+
+Needs Xcode 15+ (or the Command Line Tools with a Swift 5.9 toolchain).
 
 ```bash
+git clone https://github.com/maheshj01/ifold.git
+cd ifold
 ./build.sh --run        # build, assemble build/iFold.app, launch
 ./build.sh --install    # same, then copy to /Applications
 ```
 
-On first launch macOS asks for Screen Recording. Grant it under
-**System Settings → Privacy & Security → Screen & System Audio Recording**,
-then relaunch (the menu bar popover has a Relaunch button).
+`build.sh` signs with whatever Apple identity is in your keychain (so the Screen
+Recording grant survives rebuilds) and falls back to an ad-hoc signature.
+On first launch grant Screen Recording as described above, then relaunch.
 
 ## Using it
 
@@ -63,9 +95,10 @@ Click anywhere on the bent desktop to pause until the lid opens again.
   adds Darwin-notification-triggered screenshot and demo-motion hooks; they are
   intentionally absent from normal builds because it would let any local
   process borrow iFold's Screen Recording grant.
-- **Distribution note.** `build.sh` signs with your Apple Development identity,
-  which is fine for your own Macs. To hand the app to anyone else, sign with
-  Developer ID and notarize, or Gatekeeper will refuse it.
+- **Distribution note.** Release DMGs are currently signed with an Apple
+  Development identity, not notarized — hence the one-time *Open Anyway* step.
+  `release.sh` notarizes and staples automatically as soon as a Developer ID
+  certificate and a `notarytool` profile are present.
 
 Known limitation: while the desktop is bent, the overlay sits above every
 other window (like Bendy). A system dialog that appears at that moment is
@@ -110,6 +143,24 @@ defaults write com.wml.ifold snapshotPath ~/Desktop/ifold.png && notifyutil -p c
 # Scripted close / pause / flick-open lid path in Manual mode, visible to screen recorders
 notifyutil -p com.wml.ifold.demo
 ```
+
+## Releasing (maintainers)
+
+```bash
+./release.sh            # → dist/iFold.dmg + dist/SHA256SUMS
+```
+
+Builds, signs, lays out the DMG (app + Applications shortcut), and — if a
+*Developer ID Application* identity and a `notarytool` keychain profile named
+`ifold` exist — notarizes and staples both the app and the DMG. Then:
+
+```bash
+git tag v1.0.0 && git push --tags
+gh release create v1.0.0 dist/iFold.dmg dist/SHA256SUMS --title "iFold 1.0.0" --notes-file notes.md
+```
+
+The asset is always named `iFold.dmg` so the
+`releases/latest/download/iFold.dmg` link in this README keeps working.
 
 ## How it works
 
