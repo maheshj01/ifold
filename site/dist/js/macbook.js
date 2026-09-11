@@ -355,6 +355,8 @@ function drawFoldedDesktop(ctx, projector, angle, preset, textures, pixel) {
   const screen = displayPoints().map(([x, u]) => lid(x, u, 0.6));
   polygon(ctx, screen, '#050608');
 
+  if (!textures) return; // still loading: leave the screen dark
+
   const fold = clamp((FLAT_ANGLE - angle) / FOLD_RANGE, 0, 1);
   const tilt = fold * MAX_TILT;
   const stripHeight = DISPLAY.height / STRIPS;
@@ -459,7 +461,7 @@ function drawWithMotionBlur(ctx, source, radiusPx) {
  * @param {string} frame.preset       'silk' | 'shade' | 'frost'
  * @param {boolean} frame.dark        true on a dark background (deeper ground shadow)
  * @param {number} [frame.motionBlur] blur radius in app points (0–28), see APP_SCREEN_HEIGHT_PT
- * @param {{sharp: HTMLCanvasElement, frosted: HTMLCanvasElement}} frame.textures
+ * @param {{sharp: CanvasImageSource, frosted: HTMLCanvasElement} | null} frame.textures  null while loading
  */
 export function drawMacBook(canvas, { angle, preset, dark, motionBlur = 0, textures }) {
   const rect = canvas.getBoundingClientRect();

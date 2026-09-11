@@ -33,11 +33,12 @@ site/dist/
 ├── js/
 │   ├── main.js           entry point: hero scroll, playground controls, wiring
 │   ├── macbook.js        millimetre-accurate MacBook Pro 14" renderer, folding desktop, motion blur
-│   ├── desktop-texture.js  paints the fictional desktop (sharp + frosted copies)
+│   ├── desktop-texture.js  loads the desktop screenshot and builds the frosted copy
 │   ├── fold-view.js      spring + motion-blur state per canvas (ported from the app), replay, rAF loop
 │   └── dialogs.js        native <dialog> behaviour and the copy button
 └── assets/
     ├── icon.svg, favicon-32.png, apple-touch-icon.png
+    ├── desktop.{webp,jpg}   the real desktop shown on the screen
     ├── og.jpg            1200×630 social preview
     └── ifold-in-action-{800,1200,1800}.{jpg,webp}   responsive photo
 ```
@@ -52,7 +53,7 @@ Scroll the hero to lower the lid and curl the desktop; "See it move" replays a c
 
 **The motion** (`js/fold-view.js`) is a direct port of the app's Swift `Spring` and blur logic: a second-order spring (0.32 s response, 0.82 damping) chases the lid angle, and the motion-blur radius follows the spring's angular speed — fast attack, slow release — so the picture smears the instant the lid moves and resolves as it settles. The blur is a vertical multi-sample smear of the folded-desktop layer, standing in for the app's `CIMotionBlur`.
 
-The desktop texture is generated on a canvas at load — an invented, quiet desktop, not a capture of anyone's screen. `prefers-reduced-motion` disables the scroll-driven animation and replaces replays with a two-state toggle. Dialogs are native `<dialog>` elements, so Escape and focus handling come for free.
+The desktop on the screen is a real macOS screenshot (`assets/desktop.webp`, JPEG fallback), loaded asynchronously — the MacBook draws at once with a dark screen and the desktop fills in when the image arrives. `prefers-reduced-motion` disables the scroll-driven animation and replaces replays with a two-state toggle. Dialogs are native `<dialog>` elements, so Escape and focus handling come for free.
 
 ## Product notes
 

@@ -6,7 +6,7 @@
  *  - Both can "replay" a scripted close-and-open.
  */
 
-import { createDesktopTexture, createFrostedTexture } from './desktop-texture.js';
+import { loadDesktopTextures } from './desktop-texture.js';
 import { FoldView, Animator, OPEN_ANGLE, reducedMotion } from './fold-view.js';
 import { setupDialogs } from './dialogs.js';
 
@@ -15,9 +15,6 @@ const smoothstep = (t) => t * t * (3 - 2 * t);
 
 /** How far the hero lid drops when the section is fully scrolled. */
 const HERO_DROP = 62;
-
-const sharp = createDesktopTexture();
-const textures = { sharp, frosted: createFrostedTexture(sharp) };
 
 const hero = document.querySelector('.hero');
 const heroCopy = document.querySelector('.hero-copy');
@@ -41,7 +38,14 @@ const demoView = new FoldView(document.querySelector('#demo-canvas'), {
 demoView.restingTarget = () => Number(angleInput.value);
 demoView.visible = false; // until it scrolls into view
 
-const animator = new Animator([heroView, demoView], textures);
+// The MacBook draws immediately with a dark screen; the desktop fills in once loaded.
+const animator = new Animator([heroView, demoView], null);
+loadDesktopTextures()
+  .then((textures) => {
+    animator.textures = textures;
+    animator.wake();
+  })
+  .catch((error) => console.error(error));
 
 // --- Hero scroll -----------------------------------------------------------
 
