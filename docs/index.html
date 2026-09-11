@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iFold — your desktop folds with the lid</title>
+<meta name="description" content="iFold bends your Mac's live desktop as you close the lid. Free, open source, on-device. Download for Apple silicon MacBooks on macOS 14+.">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta property="og:title" content="iFold — your desktop folds with the lid">
+<meta property="og:description" content="Reads the MacBook hinge sensor and bends the live desktop as the lid comes down. Free and open source.">
+<meta property="og:image" content="https://maheshj01.github.io/ifold/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --al: #E4E6EA;        /* aluminum ground */
+    --al-2: #D7DAE0;      /* aluminum, in shadow */
+    --ink: #141519;
+    --ink-2: #4E5259;
+    --ink-3: #8A8F98;
+    --bezel: #0B0C0F;
+    --coral: #FF7A59;
+    --violet: #A360FF;
+    --sky: #4AA4FF;
+    --wallpaper: linear-gradient(115deg, var(--coral) 0%, var(--violet) 52%, var(--sky) 100%);
+    --display: "Familjen Grotesk", -apple-system, "SF Pro Display", system-ui, sans-serif;
+    --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --w: 1100px;
+    --r: 14px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; overflow-x: hidden; background: var(--al); color: var(--ink);
+    font: 17px/1.55 var(--body); -webkit-font-smoothing: antialiased;
+    background-image: radial-gradient(1200px 600px at 70% -10%, #F4F5F7 0%, transparent 60%);
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; border-radius: 6px; }
+  .wrap { max-width: var(--w); margin: 0 auto; padding: 0 28px; }
+
+  /* Top bar */
+  .top { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; font: 600 19px var(--display); letter-spacing: -0.01em; }
+  .brand img { width: 34px; height: 34px; border-radius: 8px; }
+  .top nav { display: flex; gap: 22px; font-size: 15px; color: var(--ink-2); }
+  .top nav a { text-decoration: none; } .top nav a:hover { color: var(--ink); }
+
+  /* Hero */
+  .hero { display: grid; grid-template-columns: 1.02fr 1fr; gap: 56px; align-items: center; padding: 56px 0 72px; }
+  h1 { text-wrap: balance; font: 700 clamp(40px, 5.6vw, 66px)/1.0 var(--display); letter-spacing: -0.035em; margin: 0 0 20px; }
+  h1 em { font-style: normal; background: var(--wallpaper); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lede { font-size: 19px; color: var(--ink-2); max-width: 44ch; margin: 0 0 30px; }
+  .dl { display: inline-flex; align-items: center; gap: 12px; padding: 16px 24px; border-radius: 999px; background: var(--ink); color: #fff; text-decoration: none; font: 600 17px var(--body); box-shadow: 0 1px 0 rgba(255,255,255,.4) inset, 0 8px 24px -10px rgba(0,0,0,.5); transition: transform .15s ease, box-shadow .15s ease; }
+  .dl:hover { transform: translateY(-1px); box-shadow: 0 1px 0 rgba(255,255,255,.4) inset, 0 12px 28px -10px rgba(0,0,0,.55); }
+  .dl:active { transform: translateY(0); }
+  .dl .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--wallpaper); }
+  .meta { margin: 14px 0 0; font: 14px var(--body); color: var(--ink-3); }
+  .meta code { font: 13px var(--mono); color: var(--ink-2); }
+  .heads-up { margin-top: 26px; padding: 14px 16px; border-left: 3px solid var(--sky); background: rgba(255,255,255,.55); border-radius: 0 10px 10px 0; font-size: 15px; color: var(--ink-2); max-width: 46ch; }
+  .heads-up a { color: var(--ink); font-weight: 600; }
+
+  /* Demo: the MacBook */
+  .demo { position: relative; }
+  .stage { perspective: 1100px; perspective-origin: 50% 70%; }
+  .mac { position: relative; border-radius: 18px 18px 10px 10px; background: var(--bezel); padding: 14px 14px 22px; box-shadow: 0 30px 60px -30px rgba(0,0,0,.55), 0 2px 0 #2a2c31 inset; }
+  .mac::after { /* the base / hinge line */
+    content: ""; position: absolute; left: -3%; right: -3%; bottom: -12px; height: 12px; border-radius: 0 0 14px 14px;
+    background: linear-gradient(#C9CCD2, #A9ADB5); box-shadow: 0 6px 14px -6px rgba(0,0,0,.5);
+  }
+  .notch { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 84px; height: 12px; background: var(--bezel); border-radius: 0 0 8px 8px; z-index: 3; }
+  .screen { aspect-ratio: 16 / 10.4; border-radius: 8px; overflow: hidden; background: #000; position: relative; }
+  .sheet {
+    position: absolute; inset: 0; transform-origin: 50% 100%; will-change: transform, filter;
+    background: var(--wallpaper);
+  }
+  .sheet .mb { position: absolute; top: 0; left: 0; right: 0; height: 7%; background: rgba(0,0,0,.35); backdrop-filter: blur(4px); }
+  .sheet .mb i { position: absolute; top: 40%; height: 20%; border-radius: 2px; background: rgba(255,255,255,.7); }
+  .sheet .dock { position: absolute; left: 50%; bottom: 3%; transform: translateX(-50%); width: 46%; height: 9%; border-radius: 8px; background: rgba(255,255,255,.28); backdrop-filter: blur(6px); display: flex; gap: 3%; padding: 1.2%; }
+  .sheet .dock i { flex: 1; border-radius: 4px; background: rgba(255,255,255,.75); }
+  .win { position: absolute; border-radius: 6px; background: #F5F5F7; box-shadow: 0 8px 24px -8px rgba(0,0,0,.45); overflow: hidden; }
+  .win::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 12%; background: #E6E6EA; }
+  .win::after { content: ""; position: absolute; top: 3.5%; left: 3%; width: 22%; height: 5%; border-radius: 999px; background: radial-gradient(circle at 12% 50%, #FF5F57 0 30%, transparent 32%), radial-gradient(circle at 50% 50%, #FEBC2E 0 30%, transparent 32%), radial-gradient(circle at 88% 50%, #28C840 0 30%, transparent 32%); }
+  .win b { position: absolute; left: 6%; right: 6%; height: 3.2%; border-radius: 3px; background: #D5D5DA; }
+  .w1 { left: 8%; top: 14%; width: 52%; height: 54%; }
+  .w2 { left: 46%; top: 30%; width: 44%; height: 50%; background: #1D1E24; }
+  .w2::before { background: #2B2C33; } .w2 b { background: #3A3B44; }
+  .shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,.75) 100%); opacity: 0; pointer-events: none; }
+  .sheen { position: absolute; inset: -20% 0; background: linear-gradient(170deg, transparent 40%, rgba(255,255,255,.35) 50%, transparent 60%); opacity: 0; pointer-events: none; mix-blend-mode: screen; }
+  .crease { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: rgba(255,255,255,.7); opacity: 0; }
+
+  .hinge { margin: 34px 6px 0; }
+  .hinge label { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; color: var(--ink-2); margin-bottom: 10px; }
+  .hinge output { font: 500 15px var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; background: transparent; margin: 0; cursor: ew-resize; }
+  input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--ink-3), var(--ink)); }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; margin-top: -9px; border-radius: 50%; background: #fff; border: 1px solid #B8BCC4; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+  input[type=range]::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--ink-3), var(--ink)); }
+  input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 1px solid #B8BCC4; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+  .hint { text-align: center; font-size: 13px; color: var(--ink-3); margin-top: 6px; }
+
+  /* Sections */
+  section { padding: 64px 0; border-top: 1px solid rgba(20,21,25,.09); }
+  h2 { font: 600 clamp(28px, 3.4vw, 38px)/1.1 var(--display); letter-spacing: -0.025em; margin: 0 0 10px; }
+  .sub { color: var(--ink-2); margin: 0 0 40px; max-width: 60ch; }
+
+  .steps { display: grid; grid-template-columns: 1fr; gap: 16px; counter-reset: step; }
+  .steps > *, .warn > * { min-width: 0; }
+  .step { position: relative; background: rgba(255,255,255,.62); border: 1px solid rgba(20,21,25,.08); border-radius: var(--r); padding: 26px 26px 26px 70px; }
+  .step p { max-width: 68ch; }
+  .step::before { counter-increment: step; content: counter(step); position: absolute; left: 24px; top: 24px; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: #fff; font: 600 14px/30px var(--display); text-align: center; }
+  .step h3 { margin: 2px 0 8px; font: 600 19px/1.25 var(--display); letter-spacing: -0.01em; }
+  .step p { margin: 0 0 10px; color: var(--ink-2); font-size: 16px; }
+  .step p:last-child { margin-bottom: 0; }
+  .step .path { display: inline-block; padding: 2px 8px; border-radius: 6px; background: rgba(20,21,25,.07); font-size: 14.5px; color: var(--ink); }
+  .step strong { color: var(--ink); }
+  .warn { display: grid; grid-template-columns: 1fr 300px; gap: 28px; align-items: start; }
+  .warn .dlg { justify-self: end; width: 300px; background: #2A2A2E; color: #F2F2F5; border-radius: 22px; padding: 26px 22px 20px; text-align: center; box-shadow: 0 30px 50px -25px rgba(0,0,0,.7); font-family: var(--body); }
+  .dlg .shield { width: 46px; height: 46px; margin: 0 auto 14px; border-radius: 12px; background: linear-gradient(#8E8E93, #636366); position: relative; }
+  .dlg .shield::after { content: "!"; position: absolute; right: -6px; bottom: -6px; width: 20px; height: 20px; border-radius: 4px; background: #FFCC00; color: #1c1c1e; font: 700 14px/20px var(--body); }
+  .dlg h4 { margin: 0 0 8px; font: 600 17px var(--body); }
+  .dlg p { margin: 0 0 18px; font-size: 13.5px; color: #C7C7CC; line-height: 1.4; }
+  .dlg .b { display: block; border-radius: 12px; padding: 10px; font: 500 15px var(--body); margin-top: 8px; }
+  .dlg .b.red { background: #E5534B; color: #fff; text-decoration: line-through; text-decoration-thickness: 2px; opacity: .8; }
+  .dlg .b.grey { background: #3A3A3F; color: #fff; outline: 3px solid var(--sky); outline-offset: 2px; }
+
+  .or { display: flex; align-items: center; gap: 12px; color: var(--ink-3); font-size: 13px; margin: 14px 0 8px; max-width: 68ch; }
+  .cmd { max-width: 68ch; }
+  .or::before, .or::after { content: ""; flex: 1; height: 1px; background: rgba(20,21,25,.12); }
+  .cmd { display: flex; align-items: center; gap: 10px; background: var(--ink); color: #E9EAEE; border-radius: 10px; padding: 10px 10px 10px 14px; font: 14px var(--mono); }
+  .cmd code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+  .cmd button { flex: none; border: 0; border-radius: 7px; padding: 7px 12px; background: #2E3037; color: #fff; font: 600 13px var(--body); cursor: pointer; }
+  .cmd button:hover { background: #3B3E47; }
+
+  .why { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  .why p { color: var(--ink-2); margin: 0 0 14px; }
+  .why ul { margin: 0; padding: 0; list-style: none; }
+  .why li { padding: 14px 0; border-top: 1px solid rgba(20,21,25,.1); color: var(--ink-2); }
+  .why li:first-child { border-top: 0; padding-top: 0; }
+  .why li strong { display: block; color: var(--ink); margin-bottom: 2px; }
+
+  footer { padding: 40px 0 60px; color: var(--ink-3); font-size: 14px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; border-top: 1px solid rgba(20,21,25,.09); }
+  footer a { color: var(--ink-2); text-decoration: none; } footer a:hover { color: var(--ink); }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 44px; padding-top: 28px; }
+    .steps, .why { grid-template-columns: 1fr; }
+    .warn { grid-template-columns: 1fr; }
+    .warn .dlg { justify-self: start; width: 100%; max-width: 300px; }
+    .step { padding: 22px 18px 22px 58px; }
+    .step::before { left: 16px; top: 20px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .dl { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#"><img src="icon.png" alt="" width="34" height="34">iFold</a>
+    <nav>
+      <a href="#install">Install</a>
+      <a href="#why">Why the warning</a>
+      <a href="https://github.com/maheshj01/ifold">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" style="border-top:0">
+      <div>
+        <h1>Your desktop <em>folds</em> with the lid.</h1>
+        <p class="lede">iFold reads your MacBook's hinge sensor and bends the live desktop as the lid comes down — perspective, motion blur, a soft click as it springs back flat. Like a foldable, on the Mac you already have.</p>
+        <a class="dl" href="https://github.com/maheshj01/ifold/releases/latest/download/iFold.dmg" download>
+          <span class="dot" aria-hidden="true"></span>Download for Mac
+        </a>
+        <p class="meta">iFold.dmg · 0.6 MB · macOS 14+ · Apple silicon MacBook with a lid sensor (M2 Air and later, 14"/16" Pro) · <a href="https://github.com/maheshj01/ifold/releases">all releases</a></p>
+        <p class="heads-up">Free and open source. It isn't notarized yet, so macOS shows one warning on first launch — <a href="#install">it takes a single click to get past</a>, steps below.</p>
+      </div>
+
+      <div class="demo">
+        <div class="stage">
+          <div class="mac" aria-hidden="true">
+            <div class="notch"></div>
+            <div class="screen">
+              <div class="sheet" id="sheet">
+                <div class="mb"><i style="left:2%;width:5%"></i><i style="left:9%;width:8%"></i><i style="left:19%;width:6%"></i><i style="right:2%;width:14%"></i></div>
+                <div class="win w1"><b style="top:20%"></b><b style="top:29%;right:30%"></b><b style="top:38%;right:45%"></b><b style="top:52%"></b><b style="top:61%;right:20%"></b></div>
+                <div class="win w2"><b style="top:22%"></b><b style="top:31%;right:35%"></b><b style="top:44%"></b><b style="top:53%;right:50%"></b><b style="top:66%;right:15%"></b></div>
+                <div class="dock"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                <div class="shade" id="shade"></div>
+                <div class="sheen" id="sheen"></div>
+                <div class="crease" id="crease"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hinge">
+          <label for="angle"><span>Lid angle</span><output id="readout" for="angle">110°</output></label>
+          <input type="range" id="angle" min="20" max="130" value="110" step="1" aria-label="Lid angle in degrees">
+          <div class="hint">Drag the hinge — the picture blurs while it moves and settles crisp, like the app.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="install">
+      <h2>Install in four steps</h2>
+      <p class="sub">Two are the usual drag-and-drop. The other two are because this build is signed but not yet notarized by Apple — you'll see one warning, and you'll grant one permission.</p>
+
+      <div class="steps">
+        <div class="step">
+          <h3>Open the DMG, drag iFold to Applications</h3>
+          <p>Then eject the disk image and launch iFold from Applications or Spotlight.</p>
+        </div>
+
+        <div class="step warn">
+          <div>
+            <h3>When macOS says it can't verify iFold, click <strong>Done</strong></h3>
+            <p>Not <em>Move to Trash</em>. This dialog appears for every app that isn't notarized, and clicking Done is what unlocks the next step.</p>
+          </div>
+          <div class="dlg" role="img" aria-label="macOS dialog: iFold.app Not Opened. Apple could not verify iFold.app is free of malware. Buttons: Move to Trash (don't click), Done (click this).">
+            <div class="shield"></div>
+            <h4>“iFold.app” Not Opened</h4>
+            <p>Apple could not verify “iFold.app” is free of malware that may harm your Mac or compromise your privacy.</p>
+            <span class="b red">Move to Trash</span>
+            <span class="b grey">Done</span>
+          </div>
+        </div>
+
+        <div class="step">
+          <h3>Allow it once</h3>
+          <p>Open <span class="path">System Settings → Privacy &amp; Security</span>, scroll to the bottom to <strong>"iFold.app was blocked to protect your Mac"</strong> and click <strong>Open Anyway</strong>, then <strong>Open</strong>. You won't be asked again.</p>
+          <div class="or">or, skip the dialog from Terminal</div>
+          <div class="cmd"><code id="cmd">xattr -d com.apple.quarantine /Applications/iFold.app</code><button type="button" id="copy" aria-label="Copy command">Copy</button></div>
+        </div>
+
+        <div class="step">
+          <h3>Grant Screen Recording, then Relaunch</h3>
+          <p>iFold draws a bent copy of your screen, so macOS asks for <strong>Screen Recording</strong>. Enable it under <span class="path">System Settings → Privacy &amp; Security → Screen &amp; System Audio Recording</span>, then click <strong>Relaunch</strong> in the iFold window. Frames stay in GPU memory and are never saved or sent anywhere.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="why">
+      <div class="why">
+        <div>
+          <h2>Why the warning?</h2>
+          <p>Notarization is Apple scanning a build and vouching for it, and it's only available through the paid Developer Program. iFold is signed with a developer certificate but hasn't been through that yet, so macOS is cautious by default — it doesn't mean anything was found.</p>
+          <p>If you'd rather not trust a binary at all, <a href="https://github.com/maheshj01/ifold#build-from-source">build it from source</a> in about a minute; the app you get is the same. Every release publishes a SHA-256 so you can check the download matches.</p>
+        </div>
+        <ul>
+          <li><strong>On device only</strong> Captured frames go straight from ScreenCaptureKit to the GPU. Nothing is encoded, written to disk, or uploaded — the app links no networking framework.</li>
+          <li><strong>Dropped on sleep and lock</strong> The capture stream stops, and the overlay is torn down, the moment the Mac sleeps, the display sleeps, or the screen locks.</li>
+          <li><strong>Only the lid sensor</strong> The hardware access is pinned to Apple's lid-angle sensor. iFold asks for no Accessibility, Input Monitoring, camera, or microphone permission.</li>
+          <li><strong>Open source, MIT</strong> <a href="https://github.com/maheshj01/ifold">Read the code</a>, file an issue, or send a fix.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>iFold · MIT license · <a href="https://github.com/maheshj01/ifold">github.com/maheshj01/ifold</a></span>
+    <span>Inspired by the iPhone Duo fold and <a href="https://trybendy.app">Bendy</a>. Not affiliated with Apple.</span>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const sheet = document.getElementById('sheet');
+  const shade = document.getElementById('shade');
+  const sheen = document.getElementById('sheen');
+  const crease = document.getElementById('crease');
+  const slider = document.getElementById('angle');
+  const readout = document.getElementById('readout');
+  const CLEAR = 100, MAX_TILT = 78, PER_DEG = 1.05;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Same idea as the app: a second-order spring follows the hinge, and blur
+  // is driven by the spring's velocity — smears while moving, resolves at rest.
+  let target = 0, x = 0, v = 0, blur = 0, last = performance.now(), touched = false, raf;
+  const tiltFor = a => Math.max(0, Math.min(MAX_TILT, (CLEAR - a) * PER_DEG));
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    const w = 2 * Math.PI / 0.32, damping = 0.82;
+    const acc = w * w * (target - x) - 2 * damping * w * v;
+    v += acc * dt; x += v * dt;
+    const wanted = Math.min(10, Math.abs(v) * 0.05);
+    blur += (wanted - blur) * (wanted > blur ? 0.6 : 0.12);
+    const t = x / MAX_TILT;
+    sheet.style.transform = `rotateX(${-x}deg)`;
+    sheet.style.filter = blur > 0.15 ? `blur(${blur.toFixed(2)}px)` : '';
+    shade.style.opacity = (t * 0.9).toFixed(3);
+    sheen.style.opacity = (Math.sin(t * Math.PI) * 0.9).toFixed(3);
+    sheen.style.transform = `translateY(${(t * 60 - 30).toFixed(1)}%)`;
+    crease.style.opacity = (t * 0.8).toFixed(3);
+    if (!touched && !reduce) {
+      // idle: a slow, hand-like close / pause / open until the visitor grabs it
+      const p = (now / 1000) % 9;
+      const a = p < 3 ? 110 - 62 * ease(p / 3) : p < 5.5 ? 48 : p < 7 ? 48 + 62 * ease((p - 5.5) / 1.5) : 110;
+      slider.value = Math.round(a); target = tiltFor(a); readout.value = Math.round(a) + '°';
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const setFromSlider = () => { touched = true; target = tiltFor(+slider.value); readout.value = slider.value + '°'; };
+  slider.addEventListener('input', setFromSlider);
+  slider.addEventListener('pointerdown', () => { touched = true; });
+  if (reduce) { target = tiltFor(+slider.value); }
+  raf = requestAnimationFrame(frame);
+
+  const copy = document.getElementById('copy');
+  copy.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(document.getElementById('cmd').textContent); copy.textContent = 'Copied'; }
+    catch { copy.textContent = 'Select & copy'; }
+    setTimeout(() => copy.textContent = 'Copy', 1600);
+  });
+})();
+</script>
+</body>
+</html>
