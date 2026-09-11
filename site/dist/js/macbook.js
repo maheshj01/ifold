@@ -19,7 +19,7 @@ const deg = (d) => (d * Math.PI) / 180;
 
 const BASE = { width: 312.6, depth: 221.2, height: 15.5, radius: 10 };
 const HINGE = { y: 2.5, z: 4 }; // pivot, relative to the base's back-top edge
-const LID = { width: 312.6, height: 216, thickness: 3.6, rim: 0.9, radiusTop: 8, radiusBottom: 2.5 };
+const LID = { width: 312.6, height: 216, thickness: 3.6, rim: 0.6, radiusTop: 8, radiusBottom: 2.5 };
 const DISPLAY = { width: 302.4, height: 196.4, bottom: 14, cornerRadius: 6 }; // bottom = mm above the hinge
 const NOTCH = { width: 38, height: 7.4, radius: 3 };
 const KEYBOARD = { unit: 19, keySize: 16.4, rows: 6, left: -139, back: 9, wellRadius: 3, wellPadding: 2 };
@@ -310,17 +310,20 @@ function lidOutline(inset = 0) {
   return roundedRectPoints(-hw, inset, hw * 2, LID.height - inset * 2, [LID.radiusTop, LID.radiusTop, LID.radiusBottom, LID.radiusBottom]).map(([x, u]) => [x, LID.height - u + inset * 0]);
 }
 
-function drawLidBack(ctx, { lid }) {
-  // Visible thickness of the lid along its top and side edges
+/**
+ * The lid's top edge (its 3.6 mm thickness). Only the top face can ever be
+ * seen from a centred camera — the side faces point away — and only when the
+ * lid leans back past vertical.
+ */
+function drawLidEdge(ctx, { lid }, angle) {
+  if (angle <= 90) return;
   const hw = LID.width / 2;
-  polygon(ctx, [lid(-hw, LID.height, 0), lid(hw, LID.height, 0), lid(hw, LID.height, -LID.thickness), lid(-hw, LID.height, -LID.thickness)], '#c9ccd1');
-  polygon(ctx, [lid(-hw, 0, 0), lid(-hw, LID.height, 0), lid(-hw, LID.height, -LID.thickness), lid(-hw, 0, -LID.thickness)], '#b8bbc1');
-  polygon(ctx, [lid(hw, 0, 0), lid(hw, LID.height, 0), lid(hw, LID.height, -LID.thickness), lid(hw, 0, -LID.thickness)], '#a9adb3');
+  polygon(ctx, [lid(-hw, LID.height, 0), lid(hw, LID.height, 0), lid(hw, LID.height, -LID.thickness), lid(-hw, LID.height, -LID.thickness)], '#a3a7ad');
 }
 
 function drawBezel(ctx, { lid }) {
   ctx.lineJoin = 'round';
-  polygon(ctx, lidOutline(0).map(([x, u]) => lid(x, u, 0)), '#c5c8cd'); // aluminium rim
+  polygon(ctx, lidOutline(0).map(([x, u]) => lid(x, u, 0)), '#9ea3a9'); // thin aluminium rim
   polygon(ctx, lidOutline(LID.rim).map(([x, u]) => lid(x, u, 0.2)), '#0b0c0e'); // black bezel
 }
 
@@ -493,7 +496,7 @@ export function drawMacBook(canvas, { angle, preset, dark, motionBlur = 0, textu
   drawSpeakerGrilles(ctx, projector, keyPixelSize);
   drawTrackpad(ctx, projector);
   drawHinge(ctx, projector);
-  drawLidBack(ctx, projector);
+  drawLidEdge(ctx, projector, angle);
   drawBezel(ctx, projector);
 
   // The folded desktop is drawn to its own layer so it can be motion-blurred
