@@ -72,7 +72,10 @@ fi
 # --- guards before we spend time building a release we can't publish --------
 if (( PUBLISH )); then
   gh auth status >/dev/null 2>&1 || { echo "gh is not logged in (gh auth login)"; exit 1; }
-  [[ -z "$(git status --porcelain)" ]] || { echo "working tree is not clean — commit or stash first"; exit 1; }
+  # Tracked changes anywhere, or untracked files among the build inputs, mean the
+  # release wouldn't be reproducible from the tag.
+  dirty=$(git status --porcelain --untracked-files=no; git status --porcelain --untracked-files=all -- Sources Resources Package.swift build.sh release.sh)
+  [[ -z "$dirty" ]] || { echo "working tree is not clean — commit or stash first:"; echo "$dirty" | sed 's/^/  /'; exit 1; }
   git fetch -q origin
   git merge-base --is-ancestor HEAD origin/main || { echo "HEAD is not pushed to origin/main — git push first"; exit 1; }
   if existing=$(git ls-remote --tags origin "refs/tags/$TAG" | cut -f1) && [[ -n "$existing" ]]; then
