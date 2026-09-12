@@ -26,7 +26,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if !FoldController.shared.screenRecordingGranted { showWelcome() }
     }
 
+    /// Launching the app while it's already running (Spotlight, Launchpad,
+    /// double-click) opens the settings window — the way back in when the
+    /// menu bar icon is hidden behind the notch on a crowded bar.
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows: Bool) -> Bool {
+        showWelcome()
+        return false
+    }
+
     func showWelcome() {
+        if let welcome { welcome.makeKeyAndOrderFront(nil); NSApp.activate(ignoringOtherApps: true); return }
         let content = SettingsView(settings: FoldController.shared.settings)
             .environmentObject(FoldController.shared)
         let w = NSWindow(contentViewController: NSHostingController(rootView: content))

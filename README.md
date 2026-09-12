@@ -104,6 +104,11 @@ Seven motions, all riding the same spring, motion blur and frost:
 
 Click anywhere on the bent desktop to pause until the lid opens again.
 
+**Can't find the icon?** On a notched MacBook, macOS silently hides menu bar items that
+don't fit beside the notch. Open iFold Mac again (Spotlight, Launchpad, or double-click it
+in Applications) and the settings window appears — it has everything the popover has,
+including Quit.
+
 ## Privacy & security posture
 
 - **On device, in GPU memory only.** Captured frames are IOSurfaces handed

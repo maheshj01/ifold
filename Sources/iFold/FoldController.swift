@@ -63,6 +63,14 @@ final class FoldController: ObservableObject {
     #endif
 
     private let maxTilt: Double = 80
+    /// Hysteresis around `clearAngle`. The sensor reports whole degrees and a
+    /// lid parked near the threshold flexes a degree or two under typing, so:
+    /// engage only once the lid is `engageBand` below clear (and has stayed
+    /// there `engageDwell`, unless it's clearly moving down), release a degree
+    /// under clear, and map the lean so the sheet is flat at the release point.
+    private let engageBand: Double = 4
+    private let engageDwell: TimeInterval = 0.12
+    private var belowSince: TimeInterval?
     private let rampDegrees: Double = 45 // frost reaches its maximum this many degrees below clearAngle
     private let prewarmMargin: Double = 15
     private let maxMotionBlur: Double = 28
@@ -297,24 +305,35 @@ final class FoldController: ObservableObject {
             } else {
                 stopCaptureIfCold()
             }
-            if canEngage, !isPaused, screenRecordingGranted, angle < clear - 1 { engage() }
+            if canEngage, !isPaused, screenRecordingGranted, shouldEngage(angle: angle, clear: clear, now: now) { engage() }
 
         case .engaged:
-            if angle >= clear + 1 { release() }
+            if angle >= clear - 1 { release() }
             animate(angle: angle, clear: clear, dt: dt)
 
         case .releasing:
             // Lid dipped again before we settled: pick it straight back up, no pop.
-            if !isPaused, angle < clear - 1 { phase = .engaged }
+            if !isPaused, angle <= clear - engageBand { phase = .engaged }
             animate(angle: angle, clear: clear, dt: dt)
             if tilt.isSettled && blurRadius < 0.3 { hideOverlay() }
         }
     }
 
+    /// Below the band, and either moving down decisively or parked there for
+    /// a moment. A wobble that crosses the line and comes back never counts.
+    private func shouldEngage(angle: Double, clear: Double, now: TimeInterval) -> Bool {
+        guard angle <= clear - engageBand else { belowSince = nil; return false }
+        if !settings.followLid || lidVelocity < -15 { return true }
+        if belowSince == nil { belowSince = now }
+        return now - belowSince! >= engageDwell
+    }
+
     /// One frame of the follower: spring toward the target lean, derive motion
     /// blur from how fast the picture is actually moving, hand the pose over.
     private func animate(angle: Double, clear: Double, dt: Double) {
-        let dropped = phase == .engaged ? max(0, clear - angle) : 0
+        // Lean is measured from just under the release point, so the sheet is
+        // already flat by the time the lid clears — no pop on the way out.
+        let dropped = phase == .engaged ? max(0, (clear - 1) - angle) : 0
         let target = min(dropped * settings.perspective, maxTilt)
         tilt.step(to: target, dt: dt)
 
@@ -341,6 +360,7 @@ final class FoldController: ObservableObject {
     }
 
     private func engage() {
+        belowSince = nil
         guard let screen = Self.builtInScreen() else { log.error("engage: no built-in screen"); return }
         log.notice("engage at \(self.effectiveAngle)° (capture running=\(self.capturer.isRunning), hasFrame=\(self.view?.hasFrame ?? false))")
         if window == nil { makeWindow(on: screen) }

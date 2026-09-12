@@ -1,3 +1,9 @@
+## What's new in 1.2.1
+
+**No more flicker at your working angle.** If the lid sat right around the *Clears at* angle, a degree of hinge flex from typing could make the effect pop in and out. The effect now needs the lid a few degrees below the threshold (and steady there, unless it's clearly closing) before it starts, lets go a degree under the threshold, and is already flat at that point — so a wobble never triggers it and there's no pop on the way out.
+
+**A way back in when the icon is hidden.** On a notched MacBook, macOS hides menu bar items that don't fit. Open iFold Mac again — Spotlight, Launchpad, or double-click in Applications — and the settings window appears, Quit included.
+
 ## What's new in 1.2.0
 
 **Seven styles.** Pick how the desktop goes as the lid comes down — *Style* in the menu bar popover:
